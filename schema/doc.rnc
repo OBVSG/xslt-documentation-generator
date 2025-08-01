@@ -1,0 +1,24 @@
+namespace doc = "http://www.obvsg.at/ns/doc"
+
+start = doc
+doc = element doc:doc {
+    attribute xml:id { text }?,
+    attribute scope { "stylesheet" | "element" }?,
+    element doc:desc { text }?,
+    element doc:param {
+        attribute name { text },
+        attribute type { text }?,
+        text }*,
+    element doc:references {
+        reference
+    }*,
+    element doc:referencedBy {
+        reference
+    }*
+}
+
+reference =
+    (text?,
+     (attribute template { text }
+     | attribute function { text })
+    )
