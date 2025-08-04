@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.jenitennison.com/xslt/xspec"
+        xspec="file:/home/ss/projects/almaConfig/xslt-documentation-generator/test/collect.xspec"
+        stylesheet="file:/home/ss/projects/almaConfig/xslt-documentation-generator/xslt/documentation-generator.xsl"
+        date="2025-08-04T18:55:28.289131001+02:00">
+   <scenario id="scenario1"
+             xspec="file:/home/ss/projects/almaConfig/xslt-documentation-generator/test/collect.xspec">
+      <label>docFromString</label>
+      <scenario id="scenario1-scenario1"
+                xspec="file:/home/ss/projects/almaConfig/xslt-documentation-generator/test/collect.xspec">
+         <label>free text only</label>
+         <input-wrap xmlns="">
+            <x:call xmlns:doc="http://www.obvsg.at/ns/doc"
+                    xmlns:utils="http://www.obvsg.at/xslt/utils"
+                    xmlns:x="http://www.jenitennison.com/xslt/xspec"
+                    function="utils:docFromString">
+               <x:param name="inString">
+
+    Beginning of text. Indented four spaces
+      - two more spaces
+        - four more spaces
+      - two more spaces
+
+Negative relative indent (0 spaces from left)
+        </x:param>
+            </x:call>
+         </input-wrap>
+         <result select="/element()">
+            <content-wrap xmlns="">
+               <doc:doc xmlns:doc="http://www.obvsg.at/ns/doc"
+                        xmlns:fn="http://www.w3.org/2005/xpath-functions"
+                        xmlns:utils="http://www.obvsg.at/xslt/utils"
+                        xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                  <doc:desc>Beginning of text. Indented four spaces
+  - two more spaces
+    - four more spaces
+  - two more spaces
+Negative relative indent (0 spaces from left)</doc:desc>
+               </doc:doc>
+            </content-wrap>
+         </result>
+         <test id="scenario1-scenario1-expect1" successful="true">
+            <label>doc:doc with doc:desc</label>
+            <expect select="/element()">
+               <content-wrap xmlns="">
+                  <doc:doc xmlns:doc="http://www.obvsg.at/ns/doc"
+                           xmlns:utils="http://www.obvsg.at/xslt/utils"
+                           xmlns:x="http://www.jenitennison.com/xslt/xspec">
+                     <doc:desc>Beginning of text. Indented four spaces
+  - two more spaces
+    - four more spaces
+  - two more spaces
+Negative relative indent (0 spaces from left)</doc:desc>
+                  </doc:doc>
+               </content-wrap>
+            </expect>
+         </test>
+      </scenario>
+      <scenario id="scenario1-scenario2"
+                xspec="file:/home/ss/projects/almaConfig/xslt-documentation-generator/test/collect.xspec">
+         <label>description and fields</label>
+         <input-wrap xmlns="">
+            <x:call xmlns:doc="http://www.obvsg.at/ns/doc"
+                    xmlns:utils="http://www.obvsg.at/xslt/utils"
+                    xmlns:x="http://www.jenitennison.com/xslt/xspec"
+                    function="utils:docFromString">
+               <x:param name="inString">
+
+    Description
+    @context marc:datafield
+    @param documentedParam A param that is very well documented
+    @param undocumentedParam
+    @returns documentation of the return value
+    @references temp;nil;datafield[@tag='245'];nil Template that matches the title field
+    @referencedBy temp;dummyTemplate;nil;dummyMode
+        </x:param>
+            </x:call>
+         </input-wrap>
+         <result select="/element()">
+            <content-wrap xmlns="">
+               <doc:doc xmlns:doc="http://www.obvsg.at/ns/doc"
+                        xmlns:fn="http://www.w3.org/2005/xpath-functions"
+                        xmlns:utils="http://www.obvsg.at/xslt/utils"
+                        xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                  <doc:desc>Description</doc:desc>
+                  <doc:context>marc:datafield</doc:context>
+                  <doc:param name="documentedParam">A param that is very well documented</doc:param>
+                  <doc:param name="undocumentedParam"/>
+                  <doc:returns>documentation of the return value</doc:returns>
+                  <doc:references ref="temp;nil;datafield[@tag='245'];nil">Template that matches the title field</doc:references>
+                  <doc:referencedBy ref="temp;dummyTemplate;nil;dummyMode"/>
+               </doc:doc>
+            </content-wrap>
+         </result>
+         <test id="scenario1-scenario2-expect1" successful="true">
+            <label>doc:doc with doc:desc</label>
+            <expect select="/element()">
+               <content-wrap xmlns="">
+                  <doc:doc xmlns:doc="http://www.obvsg.at/ns/doc"
+                           xmlns:utils="http://www.obvsg.at/xslt/utils"
+                           xmlns:x="http://www.jenitennison.com/xslt/xspec">
+                     <doc:desc>Description</doc:desc>
+                     <doc:context>marc:datafield</doc:context>
+                     <doc:param name="documentedParam">A param that is very well documented</doc:param>
+                     <doc:param name="undocumentedParam"/>
+                     <doc:returns>documentation of the return value</doc:returns>
+                     <doc:references ref="temp;nil;datafield[@tag='245'];nil">Template that matches the title field</doc:references>
+                     <doc:referencedBy ref="temp;dummyTemplate;nil;dummyMode"/>
+                  </doc:doc>
+               </content-wrap>
+            </expect>
+         </test>
+      </scenario>
+   </scenario>
+</report>

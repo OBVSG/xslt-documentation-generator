@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<x:description xmlns:x="http://www.jenitennison.com/xslt/xspec"
+               xmlns:doc="http://www.obvsg.at/ns/doc" xmlns:utils="http://www.obvsg.at/xslt/utils"
+               stylesheet="../xslt/documentation-generator.xsl">
+
+  <x:scenario label="docFromString">
+    <x:scenario label="free text only">
+
+      <x:call function="utils:docFromString">
+        <x:param name="inString">
+
+    Beginning of text. Indented four spaces
+      - two more spaces
+        - four more spaces
+      - two more spaces
+
+Negative relative indent (0 spaces from left)
+        </x:param>
+      </x:call>
+      <x:expect label="doc:doc with doc:desc">
+        <doc:doc>
+          <doc:desc>Beginning of text. Indented four spaces
+  - two more spaces
+    - four more spaces
+  - two more spaces
+Negative relative indent (0 spaces from left)</doc:desc>
+        </doc:doc>
+      </x:expect>
+    </x:scenario>
+    <x:scenario label="description and fields">
+
+      <x:call function="utils:docFromString">
+        <x:param name="inString">
+
+    Description
+    @context marc:datafield
+    @param documentedParam A param that is very well documented
+    @param undocumentedParam
+    @returns documentation of the return value
+    @references temp;nil;datafield[@tag='245'];nil Template that matches the title field
+    @referencedBy temp;dummyTemplate;nil;dummyMode
+        </x:param>
+      </x:call>
+      <x:expect label="doc:doc with doc:desc">
+        <doc:doc>
+          <doc:desc>Description</doc:desc>
+          <doc:context>marc:datafield</doc:context>
+          <doc:param name="documentedParam">A param that is very well documented</doc:param>
+          <doc:param name="undocumentedParam" />
+          <doc:returns>documentation of the return value</doc:returns>
+          <doc:references ref="temp;nil;datafield[@tag='245'];nil">Template that matches the title field</doc:references>
+          <doc:referencedBy ref="temp;dummyTemplate;nil;dummyMode" />
+        </doc:doc>
+      </x:expect>
+    </x:scenario>
+
+  </x:scenario>
+</x:description>
