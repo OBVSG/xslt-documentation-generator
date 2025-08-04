@@ -1,14 +1,27 @@
 namespace doc = "http://www.obvsg.at/ns/doc"
 
-start = doc
+start = Doc
+Doc = element doc:Doc { doc* }
 doc = element doc:doc {
     attribute xml:id { text }?,
-    attribute scope { "stylesheet" | "element" }?,
+    attribute scope { "global" | "stylesheet" | "element" }?,
+    element doc:includedFrom { attribute href { text } }?,
+    element doc:title { text }?, # only applicable if @scope=("global" or @scope="stylesheet"
+    element doc:name { text }?,
+    element doc:match { text }?,
+    element doc:mode {
+        text }?,
+    element doc:type { "template" | "function" }?,
     element doc:desc { text }?,
+    element doc:context { text }?,
     element doc:param {
         attribute name { text },
-        attribute type { text }?,
+        attribute as { text }?,
+        attribute required { "yes" | "no" }?,
         text }*,
+    element doc:returns {
+        attribute as { text }?,
+        text}?,
     element doc:references {
         reference
     }*,
@@ -18,7 +31,6 @@ doc = element doc:doc {
 }
 
 reference =
-    (text?,
-     (attribute template { text }
-     | attribute function { text })
+    (attribute ref { text },
+     text?
     )
