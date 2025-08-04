@@ -12,10 +12,16 @@
 
   <xsl:template match="xsl:stylesheet" name="entryPoint">
     <xsl:param name="includedFrom" as="xs:string" select="''" />
+    <xsl:variable name="modulePaths" select="utils:getModules(.)" />
     <doc:Doc>
       <xsl:apply-templates mode="collect">
         <xsl:with-param name="includedFrom" select="$includedFrom" />
       </xsl:apply-templates>
+      <xsl:for-each select="$modulePaths">
+        <xsl:apply-templates select="doc(.)">
+          <xsl:with-param name="includedFrom" select="." />
+        </xsl:apply-templates>
+      </xsl:for-each>
     </doc:Doc>
   </xsl:template>
 
@@ -80,4 +86,16 @@
     }</xsl:sequence>
   </xsl:template>
 
+  <xsl:function name="utils:getModules" as="xs:string*">
+    <xsl:param name="stylesheetRoot" />
+    <xsl:variable name="uriBase">{base-uri($stylesheetRoot) => replace("^file:", "") => replace("[^/]+$", "")}</xsl:variable>
+    <xsl:variable name="modulePaths" as="xs:string*">
+      <xsl:for-each select="$stylesheetRoot/xsl:include/@href">
+        <xsl:sequence select="$uriBase || ." />
+        <xsl:sequence select="utils:getModules(doc($uriBase || .)/xsl:stylesheet)" />
+      </xsl:for-each>
+    </xsl:variable>
+
+    <xsl:sequence select="$modulePaths => distinct-values()" />
+  </xsl:function>
 </xsl:stylesheet>
