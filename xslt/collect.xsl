@@ -1,8 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:utils="http://www.obvsg.at/xslt/utils" xmlns:fn="http://www.w3.org/2005/xpath-functions" xmlns:doc="http://www.obvsg.at/ns/doc" expand-text="yes" version="3.0">
 
+  <doc:doc scope="stylesheet">
+    <doc:desc>This stylesheet holds templates and functions needed to populate a `doc:Doc`-document from an XSLT-Stlyesheet. This document is intended for further processing into other formats like HTML.</doc:desc>
+  </doc:doc>
+
   <xsl:mode name="collect" on-no-match="shallow-skip" />
 
+  <!-- Documentation at the global or stylesheet level -->
+  <xsl:template match="doc:doc[@scope=('global', 'stylesheet')]" mode="collect">
+    <xsl:sequence select="." />
+  </xsl:template>
+
+  <!--
+      Generate documentation for xsl:template and xsl:function.
+
+      Collect information from the xsl-element itself and, if possible, from
+      structured commnents or `doc:doc`-elements preceding the template or function
+      definition.
+
+      @param includedFrom Path to the stylesheet that included this one with `xsl:include`
+  -->
   <xsl:template match="xsl:template|xsl:function" mode="collect">
     <xsl:param name="includedFrom" as="xs:string" />
     <xsl:variable name="id">
@@ -41,6 +59,13 @@
     </doc:doc>
   </xsl:template>
 
+  <!--
+      Fetch documentation for this element. Either from a comment or a `doc:doc` element
+      directly preceding this element.
+
+      @context xsl:function|xsl:template
+      @references func;utils:docFromString;nil;nil
+  -->
   <xsl:template name="getDocForElement">
     <xsl:choose>
         <xsl:when test="(preceding-sibling::element() | preceding-sibling::comment())[last()][self::doc:doc[not(@scope=('global', 'stylesheet'))]]">
@@ -53,9 +78,16 @@
       </xsl:choose>
   </xsl:template>
 
+  <!--
+      Collect and aggregate information about parameters from the element itself and
+      it's documentation.
+
+      @param paramsFromDoc information about the params from the documentation
+  -->
   <xsl:template name="collectParams">
     <xsl:param name="paramsFromDoc" as="element(doc:param)*" />
     <xsl:variable name="templateContext" select="." />
+    <xsl:variable name="isFunction" select="self::xsl:function" />
     <xsl:for-each select="xsl:param">
       <xsl:variable name="xslParamName" select="@name" />
       <xsl:variable name="fromDoc" select="$paramsFromDoc[@name=$xslParamName]" />
@@ -76,7 +108,7 @@
           </xsl:when>
         </xsl:choose>
         <xsl:attribute name="required"
-                       select="if (@required = ('yes', 'true', '1')) then 'yes' else 'no'" />
+                       select="if ($isFunction or @required = ('yes', 'true', '1')) then 'yes' else 'no'" />
         <xsl:text>{$fromDoc/text()}</xsl:text>
       </doc:param>
     </xsl:for-each>
@@ -85,12 +117,12 @@
   <!--
     Generate doc for return value of an xsl:function.
 
-        If possible, use the return type declared in @as.
+    If possible, use the return type declared in @as.
 
     If the return type of the documentation doesn't match @as of the function, throw an error message and terminate.
     If the return type is documented, but not declared in the function declaration, throw a warning. In this case, the return type from the documentation is used.
 
-    @param returnFromDoc doc:return-element from doc:doc corresponding to the function to document
+    @param returnFromDoc `doc:return-element` from `doc:doc` corresponding to the function to document
   -->
   <xsl:template name="docReturn">
     <xsl:param name="returnFromDoc" as="element(doc:return)?" />
@@ -113,7 +145,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- Create doc:doc element from docstring -->
+  <!-- Create `doc:doc` element from docstring -->
   <xsl:function name="utils:docFromString" as="element(doc:doc)">
     <xsl:param name="inString" as="xs:string" />
     <xsl:variable name="parts"
@@ -155,12 +187,15 @@
   <xsl:function name="utils:dedent" as="xs:string">
     <xsl:param name="inString" as="xs:string" />
     <xsl:variable name="baseIndent"
-                  select="analyze-string($inString, '^ +')/fn:match[1] => string-length()" />
+                  select="analyze-string($inString, ' +')/fn:match[1] => string-length()" />
     <xsl:choose>
+      <!-- 0 would result in a regex matching the empty string and thus a dynamic error -->
       <xsl:when test="$baseIndent gt 0">
         <xsl:value-of select="replace($inString, '(\r?\n){2,}', '&#10;BLANK_LINE&#10;')
                       => replace('^\s{' || $baseIndent || '}', '', 'm')
-                      => replace('&#10;BLANK_LINE&#10;', '&#10;&#10;')" />
+                      => replace('&#10;BLANK_LINE&#10;', '&#10;&#10;')
+                      => replace('^\s+', '')
+                      => replace('\s+$', '')" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$inString" />
