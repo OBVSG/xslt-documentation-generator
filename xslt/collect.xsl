@@ -115,7 +115,7 @@
 
   <!-- Create doc:doc element from docstring -->
   <xsl:function name="utils:docFromString" as="element(doc:doc)">
-    <xsl:param name="inString" />
+    <xsl:param name="inString" required="yes" />
     <xsl:variable name="parts"
                   select="tokenize($inString, '^\s*@', 'm')" />
     <doc:doc>
@@ -156,6 +156,7 @@
     <xsl:param name="inString" as="xs:string" />
     <xsl:variable name="baseIndent"
                   select="analyze-string($inString, '^\s+')/fn:match[1] => string-length()" />
-    <xsl:value-of select="replace($inString, '^\s{1,' || $baseIndent || '}', '', 'm') => replace('[\s\n]+$', '')" />
+    <xsl:value-of select=" replace($inString, '^\s{' || $baseIndent || '}', '', 'm')
+                          => replace('[\s\n]+$', '')" />
   </xsl:function>
 </xsl:stylesheet>

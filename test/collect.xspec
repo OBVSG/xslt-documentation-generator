@@ -23,6 +23,7 @@ Negative relative indent (0 spaces from left)
   - two more spaces
     - four more spaces
   - two more spaces
+
 Negative relative indent (0 spaces from left)</doc:desc>
         </doc:doc>
       </x:expect>
