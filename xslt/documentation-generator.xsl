@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:doc="http://www.obvsg.at/ns/doc" xmlns:utils="http://www.obvsg.at/xslt/utils" exclude-result-prefixes="xsl" expand-text="yes" version="3.0">
 
-  <!-- <xsl:output method="html" version="5.0" encoding="UTF-8" indent="yes" /> -->
+  <!-- <xsl:output method="html" version="5.0" encoding="UTF-8" indent="no" /> -->
   <xsl:output indent="yes" />
   <xsl:mode on-no-match="shallow-skip" />
   <xsl:mode name="collect" on-no-match="shallow-skip" />
 
   <xsl:preserve-space elements="doc:desc" />
 
+  <xsl:include href="utils.xsl" />
   <xsl:include href="collect.xsl" />
 
   <xsl:template match="xsl:stylesheet" name="entryPoint">
