@@ -18,7 +18,7 @@
         <xsl:with-param name="includedFrom" select="$includedFrom" />
       </xsl:apply-templates>
       <xsl:for-each select="$modulePaths">
-        <xsl:apply-templates select="doc(.)">
+        <xsl:apply-templates select="doc(.)" mode="collect">
           <xsl:with-param name="includedFrom" select="." />
         </xsl:apply-templates>
       </xsl:for-each>

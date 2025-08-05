@@ -4,7 +4,7 @@
   <xsl:mode name="collect" on-no-match="shallow-skip" />
 
   <xsl:template match="xsl:template|xsl:function" mode="collect">
-    <xsl:param name="includedFrom" />
+    <xsl:param name="includedFrom" as="xs:string" />
     <xsl:variable name="id">
       <xsl:call-template name="createId" />
     </xsl:variable>
@@ -54,7 +54,7 @@
   </xsl:template>
 
   <xsl:template name="collectParams">
-    <xsl:param name="paramsFromDoc" />
+    <xsl:param name="paramsFromDoc" as="element(doc:param)*" />
     <xsl:variable name="templateContext" select="." />
     <xsl:for-each select="xsl:param">
       <xsl:variable name="xslParamName" select="@name" />
@@ -115,7 +115,7 @@
 
   <!-- Create doc:doc element from docstring -->
   <xsl:function name="utils:docFromString" as="element(doc:doc)">
-    <xsl:param name="inString" required="yes" />
+    <xsl:param name="inString" as="xs:string" />
     <xsl:variable name="parts"
                   select="tokenize($inString, '^\s*@', 'm')" />
     <doc:doc>
