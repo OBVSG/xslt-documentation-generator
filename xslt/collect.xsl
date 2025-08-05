@@ -155,8 +155,16 @@
   <xsl:function name="utils:dedent" as="xs:string">
     <xsl:param name="inString" as="xs:string" />
     <xsl:variable name="baseIndent"
-                  select="analyze-string($inString, '^\s+')/fn:match[1] => string-length()" />
-    <xsl:value-of select=" replace($inString, '^\s{' || $baseIndent || '}', '', 'm')
-                          => replace('[\s\n]+$', '')" />
+                  select="analyze-string($inString, '^ +')/fn:match[1] => string-length()" />
+    <xsl:choose>
+      <xsl:when test="$baseIndent gt 0">
+        <xsl:value-of select="replace($inString, '(\r?\n){2,}', '&#10;BLANK_LINE&#10;')
+                      => replace('^\s{' || $baseIndent || '}', '', 'm')
+                      => replace('&#10;BLANK_LINE&#10;', '&#10;&#10;')" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$inString" />
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:function>
 </xsl:stylesheet>

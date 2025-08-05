@@ -14,6 +14,9 @@
         - four more spaces
       - two more spaces
 
+    Text at the base level.
+    Another line at base level.
+
 Negative relative indent (0 spaces from left)
         </x:param>
       </x:call>
@@ -23,6 +26,9 @@ Negative relative indent (0 spaces from left)
   - two more spaces
     - four more spaces
   - two more spaces
+
+Text at the base level.
+Another line at base level.
 
 Negative relative indent (0 spaces from left)</doc:desc>
         </doc:doc>
