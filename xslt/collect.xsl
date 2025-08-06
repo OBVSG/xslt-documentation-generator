@@ -2,6 +2,7 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:utils="http://www.obvsg.at/xslt/utils" xmlns:fn="http://www.w3.org/2005/xpath-functions" xmlns:doc="http://www.obvsg.at/ns/doc" expand-text="yes" version="3.0">
 
   <doc:doc scope="stylesheet">
+    <doc:title>collect.xsl</doc:title>
     <doc:desc>This stylesheet holds templates and functions needed to populate a `doc:Doc`-document from an XSLT-Stlyesheet. This document is intended for further processing into other formats like HTML.</doc:desc>
   </doc:doc>
 
@@ -191,9 +192,9 @@
     <xsl:choose>
       <!-- 0 would result in a regex matching the empty string and thus a dynamic error -->
       <xsl:when test="$baseIndent gt 0">
-        <xsl:value-of select="replace($inString, '(\r?\n){2,}', '&#10;BLANK_LINE&#10;')
+        <xsl:value-of select="replace($inString, '(\r?\n){2,}', '&#10;&#x2E3E;&#10;')
                       => replace('^\s{' || $baseIndent || '}', '', 'm')
-                      => replace('&#10;BLANK_LINE&#10;', '&#10;&#10;')
+                      => replace('&#10;&#x2E3E;&#10;', '&#10;&#10;')
                       => replace('^\s+', '')
                       => replace('\s+$', '')" />
       </xsl:when>
