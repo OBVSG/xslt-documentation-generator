@@ -2,6 +2,17 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:doc="http://www.obvsg.at/ns/doc" xmlns:utils="http://www.obvsg.at/xslt/utils" exclude-result-prefixes="xsl" expand-text="yes" version="3.0">
 
   <doc:doc scope="global">
+    <doc:title>XSLT Documentation Generator</doc:title>
+    <doc:desc>This XSLT application generates Documentation for XSLT-Stylesheets.</doc:desc>
+  </doc:doc>
+
+
+  <doc:doc scope="stylesheet">
+    <doc:desc>This is the main stylesheet for the `documentation-generator`.
+
+It runs the transformation to get an intermediary XML-Document in the `doc:*` namespace which is further processed to output HTML5.</doc:desc>
+  </doc:doc>
+
   <xsl:output method="html" version="5.0" encoding="UTF-8" indent="no" />
   <!-- <xsl:output indent="yes" /> -->
   <xsl:mode on-no-match="shallow-skip" />
