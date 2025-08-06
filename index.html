@@ -1,0 +1,65 @@
+<!DOCTYPE HTML><html xmlns:doc="http://www.obvsg.at/ns/doc" xmlns:utils="http://www.obvsg.at/xslt/utils" xmlns:xs="http://www.w3.org/2002/XMLSchema"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="generator" content="xslt-documentation-generator"><title>
+    XSLT Documentation Generator
+    This XSLT application generates Documentation for XSLT-Stylesheets.
+  </title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous"></head><body><div class="docBlock globalLevel"><h1>Über XSLT Documentation Generator</h1></div><div class="docBlock stylesheetLevel"><h2>Über documentation-generator.xsl</h2><div class="docDesc"><md-block>This is the main stylesheet for the `documentation-generator`.
+
+It runs the transformation to get an intermediary XML-Document in the `doc:*` namespace which is further processed to output HTML5.</md-block></div></div><div class="docBlock elementLevel" id="temp;entryPoint;xsl:stylesheet;nil"><h3>template: <code>entryPoint</code>
+                      match: 
+                      <code>xsl:stylesheet</code></h3><h4>Parameter</h4><table class="table"><thead><tr><td>Name</td><td>Sequenztyp</td><td>verpflichtend</td><td>Kommentar</td></tr></thead><tr><td>includedFrom</td><td>xs:string</td><td>no</td><td><md-span></md-span></td></tr></table></div><div class="docBlock stylesheetLevel"><h2>Über documentation-generator.xsl</h2><div class="docDesc"><md-block>This file contains utility functions. It has to be the first `xsl:include` in `documentation-generator.xsl`.</md-block></div></div><div class="docBlock elementLevel" id="temp;createId;nil;nil"><h3>template: <code>createId</code>
+                      
+                      <code></code></h3><div class="docDesc"><md-block>Create an id for a documented element.</md-block></div><p><b>Kontext: </b><code>xsl:template|xsl:function</code></p></div><div class="docBlock elementLevel" id="func;utils:getModules;nil;nil"><h3>function: <code>utils:getModules</code>
+                      
+                      <code></code></h3><div class="docDesc"><md-block>Collects the paths to files included by `xsl:include`</md-block></div><h4>Parameter</h4><table class="table"><thead><tr><td>Name</td><td>Sequenztyp</td><td>verpflichtend</td><td>Kommentar</td></tr></thead><tr><td>stylesheetRoot</td><td></td><td>yes</td><td><md-span></md-span></td></tr></table><h4>Rückgabewert</h4><table class="table"><thead><tr><td>Sequenztyp</td><td>Kommentar</td></tr></thead><tr><td>xs:string*</td><td><md-span></md-span></td></tr></table></div><div class="docBlock elementLevel" id="func;utils:format-message;nil;nil"><h3>function: <code>utils:format-message</code>
+                      
+                      <code></code></h3><h4>Parameter</h4><table class="table"><thead><tr><td>Name</td><td>Sequenztyp</td><td>verpflichtend</td><td>Kommentar</td></tr></thead><tr><td>severity</td><td>xs:string</td><td>yes</td><td><md-span></md-span></td></tr><tr><td>context</td><td></td><td>yes</td><td><md-span></md-span></td></tr><tr><td>message</td><td>xs:string</td><td>yes</td><td><md-span></md-span></td></tr></table><h4>Rückgabewert</h4><table class="table"><thead><tr><td>Sequenztyp</td><td>Kommentar</td></tr></thead><tr><td>unknown</td><td><md-span></md-span></td></tr></table></div><div class="docBlock stylesheetLevel"><h2>Über collect.xsl</h2><div class="docDesc"><md-block>This stylesheet holds templates and functions needed to populate a `doc:Doc`-document from an XSLT-Stlyesheet. This document is intended for further processing into other formats like HTML.</md-block></div></div><div class="docBlock elementLevel" id="temp;nil;doc:doc[@scope=('global', 'stylesheet')];collect"><h3>template: <code></code>
+                      match: 
+                      <code>doc:doc[@scope=('global', 'stylesheet')]</code></h3><div class="docDesc"><md-block>Documentation at the global or stylesheet level</md-block></div></div><div class="docBlock elementLevel" id="temp;nil;xsl:template|xsl:function;collect"><h3>template: <code></code>
+                      match: 
+                      <code>xsl:template|xsl:function</code></h3><div class="docDesc"><md-block>Generate documentation for xsl:template and xsl:function.
+
+Collect information from the xsl-element itself and, if possible, from
+structured commnents or `doc:doc`-elements preceding the template or function
+definition.</md-block></div><h4>Parameter</h4><table class="table"><thead><tr><td>Name</td><td>Sequenztyp</td><td>verpflichtend</td><td>Kommentar</td></tr></thead><tr><td>includedFrom</td><td>xs:string</td><td>no</td><td><md-span>Path to the stylesheet that included this one with `xsl:include`</md-span></td></tr></table></div><div class="docBlock elementLevel" id="temp;getDocForElement;nil;nil"><h3>template: <code>getDocForElement</code>
+                      
+                      <code></code></h3><div class="docDesc"><md-block>Fetch documentation for this element. Either from a comment or a `doc:doc` element
+directly preceding this element.</md-block></div><p><b>Kontext: </b><code>xsl:function|xsl:template</code></p><h4>Referenziert</h4><table class="table"><thead><tr><td>Referenz</td><td>Anmerkung</td></tr></thead><tr><td><a href="#func;utils:docFromString;nil;nil">func;utils:docFromString;nil;nil</a></td><td></td></tr></table></div><div class="docBlock elementLevel" id="temp;collectParams;nil;nil"><h3>template: <code>collectParams</code>
+                      
+                      <code></code></h3><div class="docDesc"><md-block>Collect and aggregate information about parameters from the element itself and
+it's documentation.</md-block></div><h4>Parameter</h4><table class="table"><thead><tr><td>Name</td><td>Sequenztyp</td><td>verpflichtend</td><td>Kommentar</td></tr></thead><tr><td>paramsFromDoc</td><td>element(doc:param)*</td><td>no</td><td><md-span>information about the params from the documentation</md-span></td></tr></table></div><div class="docBlock elementLevel" id="temp;docReturn;nil;nil"><h3>template: <code>docReturn</code>
+                      
+                      <code></code></h3><div class="docDesc"><md-block>Generate doc for return value of an xsl:function.
+
+If possible, use the return type declared in @as.
+
+If the return type of the documentation doesn't match @as of the function, throw an error message and terminate.
+If the return type is documented, but not declared in the function declaration, throw a warning. In this case, the return type from the documentation is used.</md-block></div><h4>Parameter</h4><table class="table"><thead><tr><td>Name</td><td>Sequenztyp</td><td>verpflichtend</td><td>Kommentar</td></tr></thead><tr><td>returnFromDoc</td><td>element(doc:return)?</td><td>no</td><td><md-span>`doc:return-element` from `doc:doc` corresponding to the function to document</md-span></td></tr></table></div><div class="docBlock elementLevel" id="func;utils:docFromString;nil;nil"><h3>function: <code>utils:docFromString</code>
+                      
+                      <code></code></h3><div class="docDesc"><md-block>Create `doc:doc` element from docstring</md-block></div><h4>Parameter</h4><table class="table"><thead><tr><td>Name</td><td>Sequenztyp</td><td>verpflichtend</td><td>Kommentar</td></tr></thead><tr><td>inString</td><td>xs:string</td><td>yes</td><td><md-span></md-span></td></tr></table><h4>Rückgabewert</h4><table class="table"><thead><tr><td>Sequenztyp</td><td>Kommentar</td></tr></thead><tr><td>element(doc:doc)</td><td><md-span></md-span></td></tr></table></div><div class="docBlock elementLevel" id="func;utils:dedent;nil;nil"><h3>function: <code>utils:dedent</code>
+                      
+                      <code></code></h3><div class="docDesc"><md-block>Dedent a multiline string by the indentation amount of the first line.</md-block></div><h4>Parameter</h4><table class="table"><thead><tr><td>Name</td><td>Sequenztyp</td><td>verpflichtend</td><td>Kommentar</td></tr></thead><tr><td>inString</td><td>xs:string</td><td>yes</td><td><md-span></md-span></td></tr></table><h4>Rückgabewert</h4><table class="table"><thead><tr><td>Sequenztyp</td><td>Kommentar</td></tr></thead><tr><td>xs:string</td><td><md-span></md-span></td></tr></table></div><div class="docBlock stylesheetLevel"><h2>Über html.xsl</h2><div class="docDesc"><md-block>This stylesheet contains functions to create HTML5 output for input from the `doc:*` namespace.
+
+It is intended to be included by `documentation-generator.xsl` and may call functions or templates that are only
+in scope when included by said stylesheet.</md-block></div></div><div class="docBlock elementLevel" id="temp;nil;doc:Doc;html"><h3>template: <code></code>
+                      match: 
+                      <code>doc:Doc</code></h3></div><div class="docBlock elementLevel" id="temp;createHtmlHead;nil;nil"><h3>template: <code>createHtmlHead</code>
+                      
+                      <code></code></h3><div class="docDesc"><md-block>Create an HTML `head` element.</md-block></div><p><b>Kontext: </b><code>xsl:stylesheet</code></p></div><div class="docBlock elementLevel" id="temp;nil;doc:doc[@scope='global'];html"><h3>template: <code></code>
+                      match: 
+                      <code>doc:doc[@scope='global']</code></h3></div><div class="docBlock elementLevel" id="temp;nil;doc:doc[@scope='stylesheet'];html"><h3>template: <code></code>
+                      match: 
+                      <code>doc:doc[@scope='stylesheet']</code></h3><div class="docDesc"><md-block>Documentation at stylesheet level.</md-block></div></div><div class="docBlock elementLevel" id="temp;nil;doc:doc;html"><h3>template: <code></code>
+                      match: 
+                      <code>doc:doc</code></h3><div class="docDesc"><md-block>Documentation on element level</md-block></div></div><div class="docBlock elementLevel" id="temp;nil;doc:desc;html"><h3>template: <code></code>
+                      match: 
+                      <code>doc:desc</code></h3><div class="docDesc"><md-block>Format description (`doc:desc`)
+
+We use md-block so descriptions in Markdown syntax are rendered by the browser. Therefore `doc:desc`
+has to be wrapped in an `md-block` element.</md-block></div></div><div class="docBlock elementLevel" id="temp;nil;doc:context;html"><h3>template: <code></code>
+                      match: 
+                      <code>doc:context</code></h3></div><div class="docBlock elementLevel" id="temp;renderParams;nil;nil"><h3>template: <code>renderParams</code>
+                      
+                      <code></code></h3><div class="docDesc"><md-block>Render the parameter list as table.</md-block></div></div><div class="docBlock elementLevel" id="temp;renderReturn;nil;nil"><h3>template: <code>renderReturn</code>
+                      
+                      <code></code></h3><div class="docDesc"><md-block>Render the return vaue as table.</md-block></div></div><div class="docBlock elementLevel" id="temp;renderRef;nil;nil"><h3>template: <code>renderRef</code>
+                      
+                      <code></code></h3><div class="docDesc"><md-block>Render references as table</md-block></div><h4>Parameter</h4><table class="table"><thead><tr><td>Name</td><td>Sequenztyp</td><td>verpflichtend</td><td>Kommentar</td></tr></thead><tr><td>refType</td><td></td><td>yes</td><td><md-span></md-span></td></tr></table><h4>Referenziert von</h4><table class="table"><thead><tr><td>Referenz</td><td>Anmerkung</td></tr></thead><tr><td><a href="#temp;nil;doc:doc;html">temp;nil;doc:doc;html</a></td><td>Wird vom template für Element-Dokumentation aufgerufen.</td></tr></table></div><script type="module" src="https://md-block.verou.me/md-block.js"></script><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script></body></html>
