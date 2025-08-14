@@ -10,7 +10,14 @@
 
   <!-- Documentation at the global or stylesheet level -->
   <xsl:template match="doc:doc[@scope=('global', 'stylesheet')]" mode="collect">
-    <xsl:sequence select="." />
+    <xsl:param name="includedFrom" as="xs:string" />
+      <doc:doc scope="{@scope}">
+        <xsl:if test="$includedFrom ne ''">
+          <doc:includedFrom href="{$includedFrom}" />
+        </xsl:if>
+        <xsl:sequence select="*" />
+      </doc:doc>
+
   </xsl:template>
 
   <!--
