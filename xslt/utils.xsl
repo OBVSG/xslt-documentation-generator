@@ -23,17 +23,17 @@
 
       @return A sequence of unique absolute paths
   -->
-  <xsl:function name="utils:getModules" as="xs:string*">
+  <xsl:function name="utils:getModules">
     <xsl:param name="stylesheetRoot" />
     <xsl:variable name="uriBase">{base-uri($stylesheetRoot) => replace("^file:", "") => replace("[^/]+$", "")}</xsl:variable>
-    <xsl:variable name="modulePaths" as="xs:string*">
+    <xsl:variable name="modulePaths" as="map(*)*">
       <xsl:for-each select="$stylesheetRoot/xsl:include/@href">
-        <xsl:sequence select="$uriBase || ." />
-        <xsl:sequence select="utils:getModules(doc($uriBase || .)/xsl:stylesheet)" />
+        <xsl:variable name="absPath" select="$uriBase || ." />
+        <xsl:sequence select="(map{'absPath': $absPath, 'relPath': string(.)}, utils:getModules(doc($absPath)/xsl:stylesheet))" />
       </xsl:for-each>
     </xsl:variable>
 
-    <xsl:sequence select="$modulePaths => distinct-values()" />
+    <xsl:sequence select="$modulePaths" />
   </xsl:function>
 
 

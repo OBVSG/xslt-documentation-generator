@@ -26,20 +26,21 @@ It runs the transformation to get an intermediary XML-Document in the `doc:*` na
 
   <xsl:template match="xsl:stylesheet" name="entryPoint">
     <xsl:param name="includedFrom" as="xs:string" select="''" />
-    <xsl:variable name="modulePaths" select="utils:getModules(.)" />
+    <xsl:variable name="modulePaths" select="utils:getModules(.)" as="map(*)*" />
     <xsl:variable name="structuredDoc">
       <doc:Doc>
         <xsl:apply-templates mode="collect">
           <xsl:with-param name="includedFrom" select="$includedFrom" />
         </xsl:apply-templates>
         <xsl:for-each select="$modulePaths">
-          <xsl:apply-templates select="doc(.)" mode="collect">
-            <xsl:with-param name="includedFrom" select="." />
+          <xsl:apply-templates select="doc(.('absPath'))" mode="collect">
+            <xsl:with-param name="includedFrom" select=".('relPath')" />
           </xsl:apply-templates>
         </xsl:for-each>
       </doc:Doc>
     </xsl:variable>
     <xsl:apply-templates select="$structuredDoc" mode="html" />
+    <!-- <xsl:sequence select="$structuredDoc" /> -->
   </xsl:template>
 
 </xsl:stylesheet>
