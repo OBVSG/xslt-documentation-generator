@@ -38,7 +38,7 @@
       <xsl:call-template name="getDocForElement" />
     </xsl:variable>
     <doc:doc>
-      <xsl:attribute name="xml:id" select="$id" />
+      <xsl:attribute name="id" select="$id" />
       <xsl:if test="$includedFrom ne ''">
         <doc:includedFrom href="{$includedFrom}" />
       </xsl:if>
