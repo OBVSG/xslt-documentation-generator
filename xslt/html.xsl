@@ -22,6 +22,7 @@ in scope when included by said stylesheet.</doc:desc>
         <xsl:apply-templates mode="html" />
         <script type="module" src="https://md-block.verou.me/md-block.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
+        <script>hljs.highlightAll();</script>
       </body>
     </html>
   </xsl:template>
@@ -47,6 +48,10 @@ in scope when included by said stylesheet.</doc:desc>
       </xsl:choose>
       <!-- <link rel="stylesheet" type="text/css" href="assets/css/style.css" /> -->
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous" />
+   <!--Highlight.js: https://highlightjs.org/usage/-->
+    <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.3.1/styles/default.min.css" />
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.3.1/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
     </head>
   </xsl:template>
 
@@ -211,6 +216,25 @@ in scope when included by said stylesheet.</doc:desc>
       IMPORTANT: doc:src has to have a matching template here lest it will be processed as doc as it includes doc:* elements.
   -->
   <xsl:template match="doc:src" mode="html">
+    <div class="accordion">
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button" type="button"
+            data-bs-toggle="collapse" data-bs-target="#collapse{generate-id()}"
+            aria-expanded="true" aria-controls="collapseOne">{if ($lang eq 'eng') then "Source Code" else "Quellcode"}</button>
+        </h2>
+        <div id="collapse{generate-id()}" class="accordion-collapse collapse"
+          data-bs-parent="#accordionExample">
+          <div class="accordion-body">
+            <pre class="language-xml">
+              <code>
+                <xsl:value-of select="serialize(.)" />
+              </code>
+            </pre>
+          </div>
+        </div>
+      </div>
+    </div>
   </xsl:template>
 
 </xsl:stylesheet>
