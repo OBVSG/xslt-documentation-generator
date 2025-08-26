@@ -9,6 +9,8 @@ It is intended to be included by `documentation-generator.xsl` and may call func
 in scope when included by said stylesheet.</doc:desc>
   </doc:doc>
 
+  <xsl:param name="lang" select="ger" />
+
   <xsl:mode name="html" on-no-match="shallow-skip" />
   <xsl:mode name="toc" on-no-match="shallow-skip" />
 
@@ -57,7 +59,8 @@ in scope when included by said stylesheet.</doc:desc>
 
   <xsl:template match="doc:doc[@scope='global']" mode="html">
     <div class="docBlock globalLevel" id="{escape-html-uri(@id)}">
-      <h1>Über {if (doc:title) then doc:title else "diese Applikation"}</h1>
+      <h1>{if ($lang eq 'ger') then "Über" else "About"} {if (doc:title) then doc:title else
+        if ($lang eq 'ger') then "diese Applikation" else "this Application"}</h1>
       <xsl:apply-templates select="doc:desc" mode="html" />
     </div>
   </xsl:template>
@@ -65,7 +68,7 @@ in scope when included by said stylesheet.</doc:desc>
   <!-- Documentation at stylesheet level. -->
   <xsl:template match="doc:doc[@scope='stylesheet']" mode="html">
     <div class="docBlock stylesheetLevel" id="{escape-html-uri(@id)}">
-      <h2>Über {if (doc:title) then doc:title else doc:includedFrom/@href}</h2>
+      <h2>{if ($lang eq 'ger') then "Über" else "About"} {if (doc:title) then doc:title else doc:includedFrom/@href}</h2>
       <xsl:if test="doc:includedFrom">
         <p>Included from {doc:includedFrom/@href}</p>
       </xsl:if>
@@ -115,21 +118,31 @@ in scope when included by said stylesheet.</doc:desc>
   </xsl:template>
 
   <xsl:template match="doc:context" mode="html">
-    <p><b>Kontext: </b> <code>{.}</code></p>
+    <p><b>{if ($lang eq 'eng') then "Context" else "Kontext"}: </b> <code>{.}</code></p>
   </xsl:template>
 
   <!--
       Render the parameter list as table.
   -->
   <xsl:template name="renderParams">
-    <h4>Parameter</h4>
+    <h4>{if ($lang eq 'ger') then "Parameter" else "Parameters"}</h4>
     <table class="table">
       <thead>
         <tr>
-          <td>Name</td>
-          <td>Sequenztyp</td>
-          <td>verpflichtend</td>
-          <td>Kommentar</td>
+          <xsl:choose>
+            <xsl:when test="$lang eq 'eng'">
+              <td>Name</td>
+              <td>Sequence type</td>
+              <td>required</td>
+              <td>Comment</td>
+            </xsl:when>
+            <xsl:otherwise>
+              <td>Name</td>
+              <td>Sequenztyp</td>
+              <td>verpflichtend</td>
+              <td>Kommentar</td>
+            </xsl:otherwise>
+          </xsl:choose>
         </tr>
       </thead>
       <xsl:for-each select="doc:param">
@@ -147,12 +160,20 @@ in scope when included by said stylesheet.</doc:desc>
       Render the return vaue as table.
   -->
   <xsl:template name="renderReturn">
-    <h4>Rückgabewert</h4>
+    <h4>{if ($lang eq 'eng') then 'Return Value' else 'Rückgabewert'}</h4>
     <table class="table">
       <thead>
         <tr>
-          <td>Sequenztyp</td>
-          <td>Kommentar</td>
+          <xsl:choose>
+            <xsl:when test="$lang eq 'eng'">
+              <td>Sequence type</td>
+              <td>Comment</td>
+            </xsl:when>
+            <xsl:otherwise>
+              <td>Sequenztyp</td>
+              <td>Kommentar</td>
+            </xsl:otherwise>
+          </xsl:choose>
         </tr>
       </thead>
       <xsl:for-each select="doc:return">
@@ -171,13 +192,28 @@ in scope when included by said stylesheet.</doc:desc>
   -->
   <xsl:template name="renderRef">
     <xsl:param name="refType" required="yes" />
-    <h4>{if ($refType eq "references") then "Referenziert" else "Referenziert von"}</h4>
+    <xsl:choose>
+      <xsl:when test="$lang eq 'eng'">
+        <h4>{if ($refType eq "references") then "Referenziert" else "Referenziert von"}</h4>
+      </xsl:when>
+      <xsl:otherwise>
+        <h4>{if ($refType eq "references") then "Referenziert" else "Referenziert von"}</h4>
+      </xsl:otherwise>
+    </xsl:choose>
+
     <table class="table">
       <thead>
         <tr>
-          <td>Referenz</td>
-          <td>Anmerkung</td>
-        </tr>
+          <xsl:choose>
+            <xsl:when test="$lang eq 'eng'">
+              <td>Reference</td>
+              <td>Comment</td>
+            </xsl:when>
+            <xsl:otherwise>
+              <td>Referenz</td>
+              <td>Anmerkung</td>
+            </xsl:otherwise>
+          </xsl:choose>        </tr>
       </thead>
       <xsl:for-each select="if ($refType eq 'references') then doc:references else doc:referencedBy">
         <tr>
@@ -192,7 +228,7 @@ in scope when included by said stylesheet.</doc:desc>
       Create a table of contents for the HTML result
   -->
   <xsl:template name="createToc">
-    <h1>Inhaltsverzeichnis</h1>
+    <h1>{if ($lang eq 'eng') then 'Table of Contents' else 'Inhaltsverzeichnis'}</h1>
     <ul>
       <xsl:for-each-group select="doc:doc"
                           group-by="doc:includedFrom/@href">
