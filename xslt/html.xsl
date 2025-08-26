@@ -9,7 +9,6 @@ It is intended to be included by `documentation-generator.xsl` and may call func
 in scope when included by said stylesheet.</doc:desc>
   </doc:doc>
 
-  <xsl:param name="lang" select="ger" />
 
   <xsl:mode name="html" on-no-match="shallow-skip" />
   <xsl:mode name="toc" on-no-match="shallow-skip" />
@@ -69,10 +68,13 @@ in scope when included by said stylesheet.</doc:desc>
   <xsl:template match="doc:doc[@scope='stylesheet']" mode="html">
     <div class="docBlock stylesheetLevel" id="{escape-html-uri(@id)}">
       <h2>{if ($lang eq 'ger') then "Über" else "About"} {if (doc:title) then doc:title else doc:includedFrom/@href}</h2>
-      <xsl:if test="doc:includedFrom">
+      <xsl:if test="doc:includedFrom/@href ne ''">
         <p>Included from {doc:includedFrom/@href}</p>
       </xsl:if>
       <xsl:apply-templates select="doc:desc" mode="html" />
+      <xsl:if test="doc:param">
+        <xsl:call-template name="renderParams" />
+      </xsl:if>
     </div>
   </xsl:template>
 
@@ -82,8 +84,8 @@ in scope when included by said stylesheet.</doc:desc>
       <h3>{doc:type}: <code>{doc:name}</code>
                       {if (doc:match/text()) then "match: " else ""}
                       <code>{doc:match}</code></h3>
-      <xsl:if test="doc:includedFrom">
-        <p>Included from {doc:includedFrom/@href}</p>
+      <xsl:if test="doc:includedFrom/@href ne ''">
+        <p>Included from <a href="#stylesheet;{escape-html-uri(doc:includedFrom/@href)}">{doc:includedFrom/@href}</a></p>
       </xsl:if>
       <xsl:apply-templates mode="html" />
       <xsl:if test="doc:param">

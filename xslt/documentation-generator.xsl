@@ -19,6 +19,8 @@ It runs the transformation to get an intermediary XML-Document in the `doc:*` na
   <xsl:mode on-no-match="shallow-skip" />
   <xsl:mode name="collect" on-no-match="shallow-skip" />
 
+  <xsl:param name="lang" select="ger" />
+
   <xsl:preserve-space elements="doc:desc" />
 
   <xsl:include href="utils.xsl" />
