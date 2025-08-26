@@ -24,7 +24,6 @@ in scope when included by said stylesheet.</doc:desc>
         <xsl:apply-templates mode="html" />
         <script type="module" src="https://md-block.verou.me/md-block.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
-        <script>hljs.highlightAll();</script>
       </body>
     </html>
   </xsl:template>
@@ -54,6 +53,7 @@ in scope when included by said stylesheet.</doc:desc>
     <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.3.1/styles/default.min.css" />
     <script src="https://unpkg.com/@highlightjs/cdn-assets@11.3.1/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+    <script>hljs.highlightAll();</script>
     </head>
   </xsl:template>
 
@@ -102,6 +102,7 @@ in scope when included by said stylesheet.</doc:desc>
           <xsl:with-param name="refType" select="'referencedBy'" />
         </xsl:call-template>
       </xsl:if>
+      <xsl:call-template name="renderSource" />
     </div>
   </xsl:template>
 
@@ -247,11 +248,12 @@ in scope when included by said stylesheet.</doc:desc>
   </xsl:template>
 
   <!--
-      TODO do something usefull with doc:src
+      Render source code.
 
-      IMPORTANT: doc:src has to have a matching template here lest it will be processed as doc as it includes doc:* elements.
+      Source code is rendered into an accordion, collapsed by default. Syntax highlighting is done by `higlight.js`. See [the `head` of the HTML](#temp;createHtmlHead;nil;nil)
+      for inclusion of `highlight.js`.
   -->
-  <xsl:template match="doc:src" mode="html">
+  <xsl:template name="renderSource">
     <div class="accordion">
       <div class="accordion-item">
         <h2 class="accordion-header">
@@ -272,5 +274,11 @@ in scope when included by said stylesheet.</doc:desc>
       </div>
     </div>
   </xsl:template>
+  <!--
+      Empty template matching `doc:src`. The rendering of source code is done by a named template.
+
+      @references temp;renderSource;nil;nil Named template rendering `doc:src` elements.
+  -->
+  <xsl:template match="doc:src" mode="html" />
 
 </xsl:stylesheet>
