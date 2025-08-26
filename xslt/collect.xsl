@@ -17,9 +17,7 @@
                        => string-join(';')"
                />
       <doc:doc scope="{@scope}" id="{$id}">
-        <xsl:if test="$includedFrom ne ''">
-          <doc:includedFrom href="{$includedFrom}" />
-        </xsl:if>
+        <doc:includedFrom href="{$includedFrom}" />
         <xsl:sequence select="*" />
       </doc:doc>
 
@@ -44,9 +42,7 @@
     </xsl:variable>
     <doc:doc>
       <xsl:attribute name="id" select="$id" />
-      <xsl:if test="$includedFrom ne ''">
-        <doc:includedFrom href="{$includedFrom}" />
-      </xsl:if>
+      <doc:includedFrom href="{$includedFrom}" />
       <xsl:if test="@name">
         <doc:name>{@name}</doc:name>
       </xsl:if>
@@ -57,6 +53,7 @@
         <doc:mode>{@mode}</doc:mode>
       </xsl:if>
       <doc:type>{local-name()}</doc:type>
+      <xsl:call-template name="displayLabel" />
       <xsl:sequence select="$docForElement/doc:doc/doc:desc" />
       <xsl:sequence select="$docForElement/doc:doc/doc:context" />
       <xsl:call-template name="collectParams">
@@ -159,6 +156,26 @@
         <doc:return as="unknown">{$returnFromDoc}</doc:return>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+
+  <!--
+      Create a name for display
+  -->
+  <xsl:template name="displayLabel">
+    <xsl:variable name="what">
+      <xsl:choose>
+        <xsl:when test="local-name() = 'template' and @name">Named template</xsl:when>
+        <xsl:when test="local-name() = 'template'">Template</xsl:when>
+        <xsl:when test="local-name() = 'function'">Function</xsl:when>
+        <xsl:otherwise>{local-name()}</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <doc:dispLabel>{
+      $what
+      || (if (@name) then ' "' || @name || '"' else "")
+      || (if (@match) then ', matching "' || @match || '"' else '')
+      || (if (@mode) then ', mode="' || @mode || '"' else '')
+    }</doc:dispLabel>
   </xsl:template>
 
   <!-- Create `doc:doc` element from docstring -->

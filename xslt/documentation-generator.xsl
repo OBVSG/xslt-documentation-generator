@@ -8,6 +8,7 @@
 
 
   <doc:doc scope="stylesheet">
+    <doc:title>Main stylesheet for XSLT Documentation Generator</doc:title>
     <doc:desc>This is the main stylesheet for the `documentation-generator`.
 
 It runs the transformation to get an intermediary XML-Document in the `doc:*` namespace which is further processed to output HTML5.</doc:desc>
@@ -33,7 +34,7 @@ It runs the transformation to get an intermediary XML-Document in the `doc:*` na
           <xsl:with-param name="includedFrom" select="$includedFrom" />
         </xsl:apply-templates>
         <xsl:for-each select="$modulePaths">
-          <xsl:apply-templates select="doc(.('absPath'))" mode="collect">
+          <xsl:apply-templates select="doc(.('absPath'))/xsl:stylesheet/child::*" mode="collect">
             <xsl:with-param name="includedFrom" select=".('relPath')" />
           </xsl:apply-templates>
         </xsl:for-each>
