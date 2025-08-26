@@ -69,6 +69,9 @@
       </xsl:if>
       <xsl:sequence select="$docForElement/doc:doc/doc:references" />
       <xsl:sequence select="$docForElement/doc:doc/doc:referencedBy" />
+      <doc:src>
+        <xsl:sequence select="." />
+      </doc:src>
     </doc:doc>
   </xsl:template>
 
