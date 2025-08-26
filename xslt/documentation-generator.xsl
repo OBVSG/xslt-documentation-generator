@@ -11,7 +11,19 @@
     <doc:title>Main stylesheet for XSLT Documentation Generator</doc:title>
     <doc:desc>This is the main stylesheet for the `documentation-generator`.
 
-It runs the transformation to get an intermediary XML-Document in the `doc:*` namespace which is further processed to output HTML5.</doc:desc>
+It runs the transformation to get an intermediary XML-Document in the `doc:*` namespace which is further processed to output HTML5.
+
+# Language of labels
+The language of the labels in HTML output can be toggled with the param `lang` at the command line. The choices are `ger` German (default if omitted) and `eng` for English.
+
+# Sample Invocation
+With Saxon at the command line, creating english documentation for `input-document.xsl` and outputting it to `dist/index.html`:
+
+```bash
+java -classpath "/path/to/saxon.jar" net.sf.saxon.Transform -s:input-document.xsl xslt/documentation-generator.xsl lang=eng > dist/index.html
+```
+    </doc:desc>
+    <doc:param name="lang">The language for the labels in the HTML output. The choices are `ger` German (default if omitted) and `eng` for English.</doc:param>
   </doc:doc>
 
   <xsl:output method="html" version="5.0" encoding="UTF-8" indent="no" />

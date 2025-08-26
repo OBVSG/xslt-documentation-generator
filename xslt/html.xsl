@@ -6,7 +6,14 @@
     <doc:desc>This stylesheet contains functions to create HTML5 output for input from the `doc:*` namespace.
 
 It is intended to be included by `documentation-generator.xsl` and may call functions or templates that are only
-in scope when included by said stylesheet.</doc:desc>
+in scope when included by said stylesheet.
+
+All match templates have `mode="html"`.
+
+Some elements (notably `doc:desc`) can contain Markdown-markup. This is rendered by [md-block](https://md-block.verou.me/).
+
+Styling is done with [Bootstrap](https://getbootstrap.com/), the highlighting of the source blocks is done with [highlight.js](https://highlightjs.org/#usage).
+    </doc:desc>
   </doc:doc>
 
 
@@ -116,7 +123,7 @@ in scope when included by said stylesheet.</doc:desc>
   -->
   <xsl:template match="doc:desc" mode="html">
     <div class="docDesc">
-      <md-block>{.}</md-block>
+      <md-block hmin="4">{.}</md-block>
     </div>
   </xsl:template>
 
