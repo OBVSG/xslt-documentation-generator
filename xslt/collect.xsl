@@ -11,7 +11,12 @@
   <!-- Documentation at the global or stylesheet level -->
   <xsl:template match="doc:doc[@scope=('global', 'stylesheet')]" mode="collect">
     <xsl:param name="includedFrom" as="xs:string" />
-      <doc:doc scope="{@scope}">
+    <xsl:param name="id"
+               select="(@scope,
+                       if ($includedFrom) then $includedFrom else replace(base-uri(), '^.*/', ''))
+                       => string-join(';')"
+               />
+      <doc:doc scope="{@scope}" id="{$id}">
         <xsl:if test="$includedFrom ne ''">
           <doc:includedFrom href="{$includedFrom}" />
         </xsl:if>
