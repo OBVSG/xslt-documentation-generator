@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2002/XMLSchema" xmlns:doc="http://www.obvsg.at/ns/doc" xmlns:utils="http://www.obvsg.at/xslt/utils" exclude-result-prefixes="xsl" expand-text="yes" version="3.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2002/XMLSchema" xmlns:doc="http://www.obvsg.at/ns/doc" xmlns:utils="http://www.obvsg.at/xslt/utils" xmlns:config="http://www.obvsg.at/ns/xslt/config" exclude-result-prefixes="xsl" expand-text="yes" version="3.0">
 
   <doc:doc scope="stylesheet">
     <doc:title>html.xsl</doc:title>
@@ -22,14 +22,28 @@ Styling is done with [Bootstrap](https://getbootstrap.com/), the highlighting of
 
   <xsl:key name="docById" match="doc:doc" use="@id" />
 
+  <xsl:variable name="htmlHeadCommon" >
+      <!-- <link rel="stylesheet" type="text/css" href="assets/css/style.css" /> -->
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous" />
+   <!--Highlight.js: https://highlightjs.org/usage/-->
+    <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.3.1/styles/default.min.css" />
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.3.1/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+    <script>hljs.highlightAll();</script>
+  </xsl:variable>
+
+  <xsl:variable name="htmlBodyScripts">
+    <script type="module" src="https://md-block.verou.me/md-block.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
+  </xsl:variable>
+
   <xsl:template match="doc:Doc" mode="html">
     <html>
       <xsl:call-template name="createHtmlHead" />
       <body>
         <xsl:call-template name="createToc" />
         <xsl:apply-templates mode="html" />
-        <script type="module" src="https://md-block.verou.me/md-block.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
+        <xsl:sequence select="$htmlBodyScripts" />
       </body>
     </html>
   </xsl:template>
@@ -53,13 +67,7 @@ Styling is done with [Bootstrap](https://getbootstrap.com/), the highlighting of
         <title>Documentation for {base-uri() => replace("^.*/", "")}</title>
         </xsl:otherwise>
       </xsl:choose>
-      <!-- <link rel="stylesheet" type="text/css" href="assets/css/style.css" /> -->
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous" />
-   <!--Highlight.js: https://highlightjs.org/usage/-->
-    <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.3.1/styles/default.min.css" />
-    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.3.1/highlight.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
-    <script>hljs.highlightAll();</script>
+      <xsl:sequence select="$htmlHeadCommon" />
     </head>
   </xsl:template>
 
@@ -275,7 +283,7 @@ Styling is done with [Bootstrap](https://getbootstrap.com/), the highlighting of
           <div class="accordion-body">
             <pre class="language-xml">
               <code>
-                <xsl:value-of select="serialize(.)" />
+                <xsl:value-of select="serialize(doc:src/child::element())" />
               </code>
             </pre>
           </div>
@@ -289,5 +297,24 @@ Styling is done with [Bootstrap](https://getbootstrap.com/), the highlighting of
       @references temp;renderSource;nil;nil Named template rendering `doc:src` elements.
   -->
   <xsl:template match="doc:src" mode="html" />
+
+  <xsl:template name="createDocIndex">
+    <xsl:param name="config" required="yes" />
+    <xsl:param name="docDir" required="yes" />
+        <html>
+          <head>
+            <xsl:sequence select="$htmlHeadCommon" />
+          </head>
+          <body>
+            <h1>Inhaltsverzeichnis</h1>
+            <ul>
+              <xsl:for-each select="$config/config:normalization">
+                <li><a href="{@distName}/index.html">{@name}</a></li>
+              </xsl:for-each>
+            </ul>
+            <xsl:sequence select="$htmlBodyScripts" />
+          </body>
+        </html>
+  </xsl:template>
 
 </xsl:stylesheet>
