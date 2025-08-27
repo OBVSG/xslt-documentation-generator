@@ -283,7 +283,7 @@ Styling is done with [Bootstrap](https://getbootstrap.com/), the highlighting of
           <div class="accordion-body">
             <pre class="language-xml">
               <code>
-                <xsl:value-of select="serialize(.)" />
+                <xsl:value-of select="serialize(doc:src/child::element())" />
               </code>
             </pre>
           </div>
