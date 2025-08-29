@@ -12,7 +12,9 @@ All match templates have `mode="html"`.
 
 Some elements (notably `doc:desc`) can contain Markdown-markup. This is rendered by [md-block](https://md-block.verou.me/).
 
-Styling is done with [Bootstrap](https://getbootstrap.com/), the highlighting of the source blocks is done with [highlight.js](https://highlightjs.org/#usage).
+Styling is done with [Pico CSS](https://picocss.com/), using the class-less version, so there are no framework-specific classes in the HTML output.
+
+The highlighting of the source blocks is done with [highlight.js](https://highlightjs.org/#usage).
     </doc:desc>
   </doc:doc>
 
@@ -22,19 +24,21 @@ Styling is done with [Bootstrap](https://getbootstrap.com/), the highlighting of
 
   <xsl:key name="docById" match="doc:doc" use="@id" />
 
-  <xsl:variable name="htmlHeadCommon" >
-      <!-- <link rel="stylesheet" type="text/css" href="assets/css/style.css" /> -->
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous" />
-   <!--Highlight.js: https://highlightjs.org/usage/-->
-    <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.3.1/styles/default.min.css" />
+  <xsl:variable name="htmlHeadCommon">
+    <!-- <link rel="stylesheet" type="text/css" href="assets/css/style.css" /> -->
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous" /> -->
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.pumpkin.min.css" />
+    <!--Highlight.js: https://highlightjs.org/usage/-->
+      <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.3.1/styles/dark.min.css" />
+      <xsl:if test="unparsed-text-available('../assets/css/style.css')">
+        <style>{unparsed-text('../assets/style.css')}</style>
+      </xsl:if>
     <script src="https://unpkg.com/@highlightjs/cdn-assets@11.3.1/highlight.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
     <script>hljs.highlightAll();</script>
   </xsl:variable>
 
   <xsl:variable name="htmlBodyScripts">
     <script type="module" src="https://md-block.verou.me/md-block.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
   </xsl:variable>
 
   <xsl:template match="doc:Doc" mode="html">
@@ -271,25 +275,14 @@ Styling is done with [Bootstrap](https://getbootstrap.com/), the highlighting of
       for inclusion of `highlight.js`.
   -->
   <xsl:template name="renderSource">
-    <div class="accordion">
-      <div class="accordion-item">
-        <h2 class="accordion-header">
-          <button class="accordion-button" type="button"
-            data-bs-toggle="collapse" data-bs-target="#collapse{generate-id()}"
-            aria-expanded="true" aria-controls="collapseOne">{if ($lang eq 'eng') then "Source Code" else "Quellcode"}</button>
-        </h2>
-        <div id="collapse{generate-id()}" class="accordion-collapse collapse"
-          data-bs-parent="#accordionExample">
-          <div class="accordion-body">
-            <pre class="language-xml">
+    <details>
+      <summary role="button">Source</summary>
+      <pre class="language-xml">
               <code>
                 <xsl:value-of select="serialize(doc:src/child::element())" />
               </code>
             </pre>
-          </div>
-        </div>
-      </div>
-    </div>
+    </details>
   </xsl:template>
   <!--
       Empty template matching `doc:src`. The rendering of source code is done by a named template.

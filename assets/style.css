@@ -1,0 +1,28 @@
+:root {
+    --pico-border-radius: 1rem;
+    --pico-typography-spacing-vertical: 1.5rem;
+}
+
+body {
+    margin-top: 100px;
+    margin-bottom: 100px;
+    margin-right: 150px;
+    margin-left: 80px;
+    width: 80%;
+}
+
+.docBlock {
+    margin-top: 50px;
+}
+.docBlock.globalLevel {
+    margin-bottom: 50px;
+}
+.docBlock.stylesheetLevel {
+    border-top: 5px solid #ffa23a;
+}
+.docBlock.elementLevel {
+    border-top: 2px solid #ffa23a;
+}
+.docBlock > :not(:first-child){
+    margin-left: 30px;
+}
