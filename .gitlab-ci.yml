@@ -1,0 +1,87 @@
+image: registry.obvsg.at:443/container/docker/saxon/xspec:debian-slim
+
+stages:
+  - docs
+  - deploy
+
+docs:
+  stage: docs
+  script:
+    - mkdir docs
+    - saxon-xslt -s:xslt/documentation-generator.xsl -xsl:xslt/documentation-generator.xsl lang=eng > docs/index.html
+  artifacts:
+    paths:
+      - docs
+
+deploy_development:
+  stage: deploy
+  environment:
+    name: development
+    url: http://share-test.obvsg.at/docs/xsltDocGenerator
+  before_script:
+    ##
+    ## Install ssh-agent if not already installed, it is required by Docker.
+    ## (change apt-get to yum if you use an RPM-based image)
+    ##
+    ##
+    - 'apt-get update -y && apt-get install rsync -y'
+    - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
+    ##
+    ## Run ssh-agent (inside the build environment)
+    ##
+    - eval $(ssh-agent -s)
+    ##
+    ## Give the right permissions, otherwise ssh-add will refuse to add files
+    ## Add the SSH key stored in SSH_PRIVATE_KEY file type CI/CD variable to the agent store
+    ##
+    - chmod 400 "$SSH_PRIVATE_KEY"
+    - ssh-add "$SSH_PRIVATE_KEY"
+    ##
+    ## Create the SSH directory and give it the right permissions
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" >> ~/.ssh/config'
+    - cp "$SSH_KNOWN_HOSTS" ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+
+  script:
+    - rsync -r -p docs/* obvsoft@galileo:/work/obvsoft/evol/apps/work_area/ss/docs/xslt-documentation-generator
+  only:
+    - development
+
+deploy_main:
+  stage: deploy
+  environment:
+    name: main
+    url: http://share.obvsg.at/docs/xslt-documentation-generator
+  before_script:
+    ##
+    ## Install ssh-agent if not already installed, it is required by Docker.
+    ## (change apt-get to yum if you use an RPM-based image)
+    ##
+    ##
+    - 'apt-get update -y && apt-get install rsync -y'
+    - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
+    ##
+    ## Run ssh-agent (inside the build environment)
+    ##
+    - eval $(ssh-agent -s)
+    ##
+    ## Give the right permissions, otherwise ssh-add will refuse to add files
+    ## Add the SSH key stored in SSH_PRIVATE_KEY file type CI/CD variable to the agent store
+    ##
+    - chmod 400 "$SSH_PRIVATE_KEY"
+    - ssh-add "$SSH_PRIVATE_KEY"
+    ##
+    ## Create the SSH directory and give it the right permissions
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" >> ~/.ssh/config'
+    - cp "$SSH_KNOWN_HOSTS" ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+
+  script:
+    - rsync -r -p docs/* obvsoft@obelix:/var/www/vhosts/share.obvsg.at/htdocs/xsldocs/xslt-documentation-generator
+
+  only:
+    - main

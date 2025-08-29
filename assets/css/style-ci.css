@@ -1,0 +1,70 @@
+body {
+    font-family: "Foundry Monoline Medium",Helvetica,Arial,sans-serif;
+    font-size: 15px;
+    line-height: 1.33;
+    /* background-color:rgb(234,235,235); */
+    /* color: #666; */
+}
+
+h1 {
+    font-size: 30px;
+    font-family: "Foundry Monoline Bold",Helvetica,Arial,sans-serif;
+    font-weight: normal;
+    line-height: 1.33;
+    color: #333;
+    text-transform: uppercase;
+}
+
+h2 {
+    font-size: 18px;
+    font-family: "Foundry Monoline Bold",Helvetica,Arial,sans-serif;
+    font-weight: normal;
+    margin-bottom: 26px;
+    text-transform: uppercase;
+    line-height: 1.25;
+    color: #333;
+}
+
+a {
+    color: #fa6908;
+}
+
+div.all {
+    margin-right: 150px;
+    margin-left: 200px;
+    padding-top: 5px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+    background-color: white;
+}
+
+div.company {
+    font-size: 14px;
+    font-family: "Foundry Monoline Bold",Helvetica,Arial,sans-serif;
+    font-weight: 600;
+    padding: 18px 12px;
+    line-height: 1.14;
+    color: #333;
+    border-width: 2px;
+    border-style: solid;
+    border-color: #fa6908;
+    text-transform: uppercase;
+}
+
+div.titlewrap {
+    margin-top: -5px;
+    margin-left: -20px;
+    margin-right: -20px;
+    background-color: rgb(116,117,121);
+    color: white;
+    padding: 18px 12px;
+}
+
+section {
+    margin-top: 40px;
+    padding-left:12px;
+    padding-bottom: 36px;
+    border-bottom: 1px solid #ffb67f;
+    border-left: 1px solid #ffb67f;
+}
