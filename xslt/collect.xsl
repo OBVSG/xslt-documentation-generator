@@ -80,7 +80,6 @@
       directly preceding this element.
 
       @context xsl:function|xsl:template
-      @references func;utils:docFromString
   -->
   <xsl:template name="getDocForElement">
     <xsl:choose>
@@ -146,8 +145,18 @@
         </xsl:if>
       </xsl:for-each>
     </xsl:variable>
+    <xsl:variable name="referencedFunctions">
+      <xsl:for-each select="(.//@select | .)
+                            ! analyze-string(., '([a-zA-Z]+:[a-zA-Z_-]+)\(')/fn:match/fn:group/string()
+                            ! ('func;' || .)
+                            => distinct-values()">
+        <xsl:if test="not($refFromDoc/@ref=.)">
+          <doc:references ref="{.}" />
+        </xsl:if>
+      </xsl:for-each>
+    </xsl:variable>
 
-    <xsl:sequence select="($refFromDoc, $referencedTemplates)" />
+    <xsl:sequence select="($refFromDoc, $referencedTemplates, $referencedFunctions)" />
   </xsl:template>
 
 
