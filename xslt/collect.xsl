@@ -31,6 +31,7 @@
       definition.
 
       @param includedFrom Path to the stylesheet that included this one with `xsl:include`
+      @references temp;createId Create ID for this documentation element
   -->
   <xsl:template match="xsl:template|xsl:function" mode="collect">
     <xsl:param name="includedFrom" as="xs:string" />
@@ -64,7 +65,9 @@
           <xsl:with-param name="returnFromDoc" select="$docForElement/doc:doc/doc:return" />
         </xsl:call-template>
       </xsl:if>
-      <xsl:sequence select="$docForElement/doc:doc/doc:references" />
+      <xsl:call-template name="collectReferences">
+        <xsl:with-param name="refFromDoc" select="$docForElement/doc:doc/doc:references" />
+      </xsl:call-template>
       <xsl:sequence select="$docForElement/doc:doc/doc:referencedBy" />
       <doc:src>
         <xsl:sequence select="." />
@@ -77,7 +80,7 @@
       directly preceding this element.
 
       @context xsl:function|xsl:template
-      @references func;utils:docFromString;nil;nil
+      @references func;utils:docFromString
   -->
   <xsl:template name="getDocForElement">
     <xsl:choose>
@@ -126,6 +129,27 @@
       </doc:param>
     </xsl:for-each>
   </xsl:template>
+
+  <!--
+      Collect and aggregate information about references (outgoing) from the element itself and
+      it's documentation.
+
+      @context xsl:element|xsl:function
+      @param refFromDoc The documentation fetched from `doc:doc` or a preceeding comment.
+  -->
+  <xsl:template name="collectReferences">
+    <xsl:param name="refFromDoc" as="element(doc:references)*" />
+    <xsl:variable name="referencedTemplates">
+      <xsl:for-each  select=".//xsl:call-template ! ('temp;' || @name)">
+        <xsl:if test="not($refFromDoc/@ref=.)">
+          <doc:references ref="{.}" />
+        </xsl:if>
+      </xsl:for-each>
+    </xsl:variable>
+
+    <xsl:sequence select="($refFromDoc, $referencedTemplates)" />
+  </xsl:template>
+
 
   <!--
     Generate doc for return value of an xsl:function.
