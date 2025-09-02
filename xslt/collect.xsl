@@ -14,13 +14,16 @@
     <xsl:param name="id"
                select="(@scope,
                        if ($includedFrom) then $includedFrom else replace(base-uri(), '^.*/', ''))
-                       => string-join(';')"
-               />
+                       => string-join(';')" />
       <doc:doc scope="{@scope}" id="{$id}">
         <doc:includedFrom href="{$includedFrom}" />
-        <xsl:sequence select="*" />
+        <xsl:if test="doc:includeMd">
+          <doc:desc>
+            <xsl:apply-templates select="doc:includeMd" mode="collect" />
+          </doc:desc>
+        </xsl:if>
+      <xsl:sequence select="*[not(doc:includeMd)]" />
       </doc:doc>
-
   </xsl:template>
 
   <!--
@@ -55,6 +58,16 @@
       </xsl:if>
       <doc:type>{local-name()}</doc:type>
       <xsl:call-template name="displayLabel" />
+      <xsl:if test="not($docForElement/doc:doc/doc:desc/text())">
+        <doc:desc>{
+          if ($lang eq 'eng') then '*[No description available]*' else '*[Keine Beschreibung verfügbar]*'
+        }</doc:desc>
+      </xsl:if>
+      <xsl:if test="$docForElement/doc:doc/doc:includeMd">
+        <doc:desc>
+          <xsl:apply-templates select="doc:includeMd" mode="collect" />
+        </doc:desc>
+      </xsl:if>
       <xsl:sequence select="$docForElement/doc:doc/doc:desc" />
       <xsl:sequence select="$docForElement/doc:doc/doc:context" />
       <xsl:call-template name="collectParams">
@@ -159,7 +172,6 @@
     <xsl:sequence select="($refFromDoc, $referencedTemplates, $referencedFunctions)" />
   </xsl:template>
 
-
   <!--
     Generate doc for return value of an xsl:function.
 
@@ -247,6 +259,14 @@
     </doc:doc>
   </xsl:function>
 
+  <!--
+      Include Markdown from file.
+  -->
+  <xsl:template match="doc:includeMd" mode="collect">
+    <xsl:if test="unparsed-text-available(@href)">
+      <xsl:sequence select="unparsed-text(@href)" />
+    </xsl:if>
+  </xsl:template>
   <!--
       Dedent a multiline string by the indentation amount of the first line.
   -->

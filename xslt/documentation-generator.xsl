@@ -3,7 +3,7 @@
 
   <doc:doc scope="global">
     <doc:title>XSLT Documentation Generator</doc:title>
-    <doc:desc>This XSLT application generates Documentation for XSLT-Stylesheets.</doc:desc>
+    <doc:includeMd href="../README.md"/>
   </doc:doc>
 
 
