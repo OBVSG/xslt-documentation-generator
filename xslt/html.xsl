@@ -23,6 +23,7 @@ The highlighting of the source blocks is done with [highlight.js](https://highli
   <xsl:mode name="toc" on-no-match="shallow-skip" />
 
   <xsl:key name="docById" match="doc:doc" use="@id" />
+  <xsl:key name="refByRef" match="doc:doc" use="doc:references/@ref" />
 
   <xsl:variable name="htmlHeadCommon">
     <!-- <link rel="stylesheet" type="text/css" href="assets/css/style.css" /> -->
@@ -113,15 +114,23 @@ The highlighting of the source blocks is done with [highlight.js](https://highli
       <xsl:if test="doc:return">
         <xsl:call-template name="renderReturn" />
       </xsl:if>
-      <xsl:if test="doc:references">
-        <xsl:call-template name="renderRef">
-          <xsl:with-param name="refType" select="'references'" />
-        </xsl:call-template>
-      </xsl:if>
-      <xsl:if test="doc:referencedBy">
-        <xsl:call-template name="renderRef">
-          <xsl:with-param name="refType" select="'referencedBy'" />
-        </xsl:call-template>
+      <!-- References -->
+      <xsl:variable name="refs">
+        <xsl:if test="doc:references">
+          <xsl:call-template name="renderRef" />
+        </xsl:if>
+        <xsl:call-template name="renderBackrefs" />
+      </xsl:variable>
+      <xsl:if test="$refs">
+        <xsl:choose>
+          <xsl:when test="$lang eq 'eng'">
+            <h4>References</h4>
+          </xsl:when>
+          <xsl:otherwise>
+            <h4>Referenzen</h4>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:sequence select="$refs" />
       </xsl:if>
       <xsl:call-template name="renderSource" />
     </div>
@@ -210,18 +219,10 @@ The highlighting of the source blocks is done with [highlight.js](https://highli
   <!--
       Render references as table
 
-@referencedBy temp;nil;doc:doc;html Wird vom template für Element-Dokumentation aufgerufen.
+@referencedBy temp;doc:doc;html Wird vom template für Element-Dokumentation aufgerufen.
   -->
   <xsl:template name="renderRef">
-    <xsl:param name="refType" required="yes" />
-    <xsl:choose>
-      <xsl:when test="$lang eq 'eng'">
-        <h4>{if ($refType eq "references") then "Referenziert" else "Referenziert von"}</h4>
-      </xsl:when>
-      <xsl:otherwise>
-        <h4>{if ($refType eq "references") then "Referenziert" else "Referenziert von"}</h4>
-      </xsl:otherwise>
-    </xsl:choose>
+    <xsl:variable name="id" select="@id" />
 
     <table class="table">
       <thead>
@@ -237,13 +238,60 @@ The highlighting of the source blocks is done with [highlight.js](https://highli
             </xsl:otherwise>
           </xsl:choose>        </tr>
       </thead>
-      <xsl:for-each select="if ($refType eq 'references') then doc:references else doc:referencedBy">
+      <xsl:for-each select="doc:references">
         <tr>
           <td><a href="#{escape-html-uri(@ref)}">{key('docById', @ref)/doc:dispLabel}</a></td>
           <td>{.}</td>
         </tr>
       </xsl:for-each>
     </table>
+  </xsl:template>
+
+  <!--
+      Get backreferences and render them.
+
+      Searching for backreferences is done here, as they might not be reachable in the collecting phase.
+  -->
+  <xsl:template name="renderBackrefs">
+    <xsl:variable name="selfId" select="@id" />
+    <xsl:variable name="docdBackrefs" select="doc:referencedBy" />
+    <xsl:variable name="collectedBackrefs" select="key('refByRef', $selfId)" />
+
+   <xsl:if test="exists($docdBackrefs | $collectedBackrefs)">
+      <table class="table">
+        <thead>
+          <tr>
+            <xsl:choose>
+              <xsl:when test="$lang eq 'eng'">
+                <td>Referenced by</td>
+              <td>Comment</td>
+              </xsl:when>
+              <xsl:otherwise>
+                <td>Referenz</td>
+              <td>Anmerkung</td>
+              </xsl:otherwise>
+            </xsl:choose>
+          </tr>
+        </thead>
+        <xsl:for-each select="doc:referencedBy">
+          <tr>
+            <td>
+              <a href="#{escape-html-uri(@ref)}">{key('docById', @ref)/doc:dispLabel}</a>
+            </td>
+            <td>{.}</td>
+          </tr>
+        </xsl:for-each>
+        <xsl:for-each
+          select="$collectedBackrefs[not(@id=($selfId, $docdBackrefs/@ref))]">
+          <tr>
+            <td>
+              <a href="#{escape-html-uri(@id)}">{doc:dispLabel}</a>
+            </td>
+            <td />
+          </tr>
+        </xsl:for-each>
+      </table>
+    </xsl:if>
   </xsl:template>
 
   <!--
@@ -287,7 +335,7 @@ The highlighting of the source blocks is done with [highlight.js](https://highli
   <!--
       Empty template matching `doc:src`. The rendering of source code is done by a named template.
 
-      @references temp;renderSource;nil;nil Named template rendering `doc:src` elements.
+      @references temp;renderSource Named template rendering `doc:src` elements.
   -->
   <xsl:template match="doc:src" mode="html" />
 
