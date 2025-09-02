@@ -48,6 +48,7 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
     <html>
       <xsl:call-template name="createHtmlHead" />
       <body>
+        <xsl:call-template name="navbar" />
         <xsl:call-template name="createToc" />
         <xsl:apply-templates mode="html" />
         <xsl:sequence select="$htmlBodyScripts" />
@@ -64,7 +65,7 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
       <meta name="generator" content="xslt-documentation-generator" />
       <xsl:choose>
         <xsl:when test="doc:doc[@scope='global'][doc:title]">
-          <title>{doc:doc[@scope='global'][doc:title]}</title>
+          <title>{doc:doc[@scope='global']/doc:title}</title>
         </xsl:when>
         <xsl:when test="doc:doc[@scope='stylesheet'][doc:title]">
           <title>{doc:doc[@scope='stylesheet']/doc:title}</title>
@@ -303,22 +304,32 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
 
   <!-- Create a table of contents for the HTML result -->
   <xsl:template name="createToc">
-    <h1>{if ($lang eq 'eng') then 'Table of Contents' else 'Inhaltsverzeichnis'}</h1>
-    <ul>
-      <xsl:for-each-group select="doc:doc"
-                          group-by="doc:includedFrom/@href">
-        <xsl:variable name="stylesheetDoc" select="current-group()[@scope='stylesheet']" />
-        <xsl:variable name="elementDoc" select="current-group()[@scope='element' or not(@scope)]" />
+    <div id="toc">
+      <h1>{if ($lang eq 'eng') then 'Table of Contents' else 'Inhaltsverzeichnis'}</h1>
+      <ul>
+        <xsl:for-each-group select="doc:doc"
+          group-by="doc:includedFrom/@href">
+          <xsl:variable name="stylesheetDoc"
+            select="current-group()[@scope='stylesheet']" />
+        <xsl:variable
+            name="elementDoc"
+            select="current-group()[@scope='element' or not(@scope)]" />
         <ul>
-          <li><a href="#{escape-html-uri($stylesheetDoc/@id)}">{if (doc:title) then doc:title else doc:includedFrom/@href }</a></li>
-          <ul>
-            <xsl:for-each select="$elementDoc">
-              <li><a href="#{escape-html-uri(@id)}">{doc:dispLabel}</a></li>
-            </xsl:for-each>
+            <li>
+              <a href="#{escape-html-uri($stylesheetDoc/@id)}">{if (doc:title)
+          then doc:title else doc:includedFrom/@href }</a>
+            </li>
+            <ul>
+              <xsl:for-each select="$elementDoc">
+                <li>
+                  <a href="#{escape-html-uri(@id)}">{doc:dispLabel}</a>
+                </li>
+              </xsl:for-each>
+            </ul>
           </ul>
-        </ul>
-      </xsl:for-each-group>
-    </ul>
+        </xsl:for-each-group>
+      </ul>
+    </div>
   </xsl:template>
 
   <!--
@@ -343,6 +354,34 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
       @references temp;renderSource Named template rendering `doc:src` elements.
   -->
   <xsl:template match="doc:src" mode="html" />
+
+  <!--
+      Create a navbar
+
+      @context doc:Doc
+  -->
+  <xsl:template name="navbar">
+    <xsl:variable name="title">
+      <xsl:choose>
+        <xsl:when test="doc:doc[@scope='global'][doc:title]">
+          <title>{doc:doc[@scope='global']/doc:title}</title>
+        </xsl:when>
+        <xsl:otherwise>
+          <!-- take file name -->
+          <title>Documentation for {base-uri() => replace("^.*/", "")}</title>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <nav>
+      <ul>
+        <li><strong>{$title}</strong></li>
+      </ul>
+      <ul>
+        <li><a href="#toc">{if ($lang eq 'eng') then 'Table of Contents' else 'Inhaltsverzeichnis'}</a></li>
+      </ul>
+    </nav>
+  </xsl:template>
 
   <!--
       Create an HTML tree with a table of contents, linking to the individual docs.
