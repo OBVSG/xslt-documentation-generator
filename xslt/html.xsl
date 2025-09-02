@@ -87,10 +87,15 @@ The highlighting of the source blocks is done with [highlight.js](https://highli
   <!-- Documentation at stylesheet level. -->
   <xsl:template match="doc:doc[@scope='stylesheet']" mode="html">
     <div class="docBlock stylesheetLevel" id="{escape-html-uri(@id)}">
-      <h2>{if ($lang eq 'ger') then "Über" else "About"} {if (doc:title) then doc:title else doc:includedFrom/@href}</h2>
-      <xsl:if test="doc:includedFrom/@href ne ''">
-        <p>Included from {doc:includedFrom/@href}</p>
-      </xsl:if>
+      <div class="heading-container">
+        <h2>{if ($lang eq 'ger') then "Über" else "About"} {if (doc:title) then
+          doc:title else doc:includedFrom/@href}</h2>
+        <xsl:if test="doc:includedFrom/@href ne ''">
+        <p>Included from <a
+              href="#stylesheet;{escape-html-uri(doc:includedFrom/@href)}">
+            {doc:includedFrom/@href}</a></p>
+        </xsl:if>
+      </div>
       <xsl:apply-templates select="doc:desc" mode="html" />
       <xsl:if test="doc:param">
         <xsl:call-template name="renderParams" />
