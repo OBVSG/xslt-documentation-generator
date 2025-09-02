@@ -101,12 +101,15 @@ The highlighting of the source blocks is done with [highlight.js](https://highli
   <!-- Documentation on element level -->
   <xsl:template match="doc:doc" mode="html">
     <div class="docBlock elementLevel" id="{escape-html-uri(@id)}">
-      <h3>{doc:type}: <code>{doc:name}</code>
-                      {if (doc:match/text()) then "match: " else ""}
-                      <code>{doc:match}</code></h3>
-      <xsl:if test="doc:includedFrom/@href ne ''">
-        <p>Included from <a href="#stylesheet;{escape-html-uri(doc:includedFrom/@href)}">{doc:includedFrom/@href}</a></p>
-      </xsl:if>
+      <div class="heading-container">
+        <h3>{doc:dispLabel}</h3>
+        <xsl:if test="doc:includedFrom/@href ne ''">
+          <p>Included from <a
+              href="#stylesheet;{escape-html-uri(doc:includedFrom/@href)}">
+            {doc:includedFrom/@href}</a></p>
+        </xsl:if>
+      </div>
+
       <xsl:apply-templates mode="html" />
       <xsl:if test="doc:param">
         <xsl:call-template name="renderParams" />
@@ -178,9 +181,9 @@ The highlighting of the source blocks is done with [highlight.js](https://highli
       </thead>
       <xsl:for-each select="doc:param">
         <tr>
-          <td>{@name}</td>
-          <td>{@as}</td>
-          <td>{@required}</td>
+          <td><code>{@name}</code></td>
+          <td><code>{@as}</code></td>
+          <td><code>{@required}</code></td>
           <td><md-span>{.}</md-span></td>
         </tr>
       </xsl:for-each>

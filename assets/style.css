@@ -11,6 +11,16 @@ body {
     width: 80%;
 }
 
+.heading-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.includedFrom p{
+    font-size: smaller;
+    text-align: right;
+}
 .docBlock {
     margin-top: 50px;
 }
