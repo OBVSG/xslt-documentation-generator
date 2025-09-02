@@ -15,6 +15,8 @@ Some elements (notably `doc:desc`) can contain Markdown-markup. This is rendered
 Styling is done with [Pico CSS](https://picocss.com/), using the class-less version, so there are no framework-specific classes in the HTML output.
 
 The highlighting of the source blocks is done with [highlight.js](https://highlightjs.org/#usage).
+
+Backreferences are also handled here, because at this stage, all `doc:doc`-elements of all included stylesheets are available for lookup.
     </doc:desc>
   </doc:doc>
 
@@ -25,9 +27,8 @@ The highlighting of the source blocks is done with [highlight.js](https://highli
   <xsl:key name="docById" match="doc:doc" use="@id" />
   <xsl:key name="refByRef" match="doc:doc" use="doc:references/@ref" />
 
+  <!-- HTML-header data for all result documents -->
   <xsl:variable name="htmlHeadCommon">
-    <!-- <link rel="stylesheet" type="text/css" href="assets/css/style.css" /> -->
-    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous" /> -->
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.pumpkin.min.css" />
     <!--Highlight.js: https://highlightjs.org/usage/-->
       <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.3.1/styles/dark.min.css" />
@@ -42,6 +43,7 @@ The highlighting of the source blocks is done with [highlight.js](https://highli
     <script type="module" src="https://md-block.verou.me/md-block.js"></script>
   </xsl:variable>
 
+  <!-- Entry point for transformation to HTML. -->
   <xsl:template match="doc:Doc" mode="html">
     <html>
       <xsl:call-template name="createHtmlHead" />
@@ -76,6 +78,7 @@ The highlighting of the source blocks is done with [highlight.js](https://highli
     </head>
   </xsl:template>
 
+  <!-- Description at the global level. -->
   <xsl:template match="doc:doc[@scope='global']" mode="html">
     <div class="docBlock globalLevel" id="{escape-html-uri(@id)}">
       <h1>{if ($lang eq 'ger') then "Über" else "About"} {if (doc:title) then doc:title else
@@ -160,9 +163,7 @@ The highlighting of the source blocks is done with [highlight.js](https://highli
     <p><b>{if ($lang eq 'eng') then "Context" else "Kontext"}: </b> <code>{.}</code></p>
   </xsl:template>
 
-  <!--
-      Render the parameter list as table.
-  -->
+  <!-- Render the parameter list as table. -->
   <xsl:template name="renderParams">
     <h4>{if ($lang eq 'ger') then "Parameter" else "Parameters"}</h4>
     <table class="table">
@@ -195,9 +196,7 @@ The highlighting of the source blocks is done with [highlight.js](https://highli
     </table>
   </xsl:template>
 
-  <!--
-      Render the return vaue as table.
-  -->
+  <!-- Render the return vaue as table. -->
   <xsl:template name="renderReturn">
     <h4>{if ($lang eq 'eng') then 'Return Value' else 'Rückgabewert'}</h4>
     <table class="table">
@@ -227,7 +226,7 @@ The highlighting of the source blocks is done with [highlight.js](https://highli
   <!--
       Render references as table
 
-@referencedBy temp;doc:doc;html Wird vom template für Element-Dokumentation aufgerufen.
+      @referencedBy temp;doc:doc;html Wird vom template für Element-Dokumentation aufgerufen.
   -->
   <xsl:template name="renderRef">
     <xsl:variable name="id" select="@id" />
@@ -302,9 +301,7 @@ The highlighting of the source blocks is done with [highlight.js](https://highli
     </xsl:if>
   </xsl:template>
 
-  <!--
-      Create a table of contents for the HTML result
-  -->
+  <!-- Create a table of contents for the HTML result -->
   <xsl:template name="createToc">
     <h1>{if ($lang eq 'eng') then 'Table of Contents' else 'Inhaltsverzeichnis'}</h1>
     <ul>
@@ -327,7 +324,7 @@ The highlighting of the source blocks is done with [highlight.js](https://highli
   <!--
       Render source code.
 
-      Source code is rendered into an accordion, collapsed by default. Syntax highlighting is done by `higlight.js`. See [the `head` of the HTML](#temp;createHtmlHead;nil;nil)
+      Source code is rendered into an accordion, collapsed by default. Syntax highlighting is done by `higlight.js`. See [the `head` of the HTML](#temp;createHtmlHead)
       for inclusion of `highlight.js`.
   -->
   <xsl:template name="renderSource">
@@ -347,7 +344,13 @@ The highlighting of the source blocks is done with [highlight.js](https://highli
   -->
   <xsl:template match="doc:src" mode="html" />
 
+  <!--
+      Create an HTML tree with a table of contents, linking to the individual docs.
+
+      @context: absent
+  -->
   <xsl:template name="createDocIndex">
+    <xsl:context-item use="absent" />
     <xsl:param name="config" required="yes" />
     <xsl:param name="docDir" required="yes" />
         <html>

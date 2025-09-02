@@ -17,10 +17,20 @@ It runs the transformation to get an intermediary XML-Document in the `doc:*` na
 The language of the labels in HTML output can be toggled with the param `lang` at the command line. The choices are `ger` German (default if omitted) and `eng` for English.
 
 # Sample Invocation
+## Supplying a stylesheet to document
 With Saxon at the command line, creating english documentation for `input-document.xsl` and outputting it to `dist/index.html`:
 
 ```bash
 java -classpath "/path/to/saxon.jar" net.sf.saxon.Transform -s:input-document.xsl xslt/documentation-generator.xsl lang=eng > dist/index.html
+```
+## Using a configuration file
+You can use a configuration file to build the documentation of an entire project. This creates a directory `dist` and puts the documentation of each stylesheet in the configuration file in a subdirectory therein. Also `dist/index.html` will contain a table of contents, linking to the individual docs.
+
+When using a config file, the initial template `main` has to be called and the parameters `lang` and `configFile` are mandatory.
+The path to the config file has to be absolute or relative to `documentation-generator.xsl`.
+
+```bash
+saxon-xslt -xsl:xslt-documentation-generator/xslt/documentation-generator.xsl -it:main lang=ger configFile=../../config.xml
 ```
     </doc:desc>
     <doc:param name="lang">The language for the labels in the HTML output. The choices are `ger` German (default if omitted) and `eng` for English.</doc:param>
@@ -80,6 +90,7 @@ java -classpath "/path/to/saxon.jar" net.sf.saxon.Transform -s:input-document.xs
     </xsl:for-each>
   </xsl:template>
 
+  <!-- Entry point template if used without configuration file. -->
   <xsl:template match="xsl:stylesheet">
     <xsl:param name="includedFrom" as="xs:string" select="''" />
     <xsl:variable name="modulePaths" select="utils:getModules(.)" as="map(*)*" />
