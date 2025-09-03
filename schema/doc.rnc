@@ -12,6 +12,7 @@ doc = element doc:doc {
     element doc:mode {
         text }?,
     element doc:type { "template" | "function" }?,
+    element doc:includeMd { attribute href {text} }?,
     element doc:desc { text }?,
     element doc:context { text }?,
     element doc:param {

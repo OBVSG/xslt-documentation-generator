@@ -15,18 +15,19 @@ Some elements (notably `doc:desc`) can contain Markdown-markup. This is rendered
 Styling is done with [Pico CSS](https://picocss.com/), using the class-less version, so there are no framework-specific classes in the HTML output.
 
 The highlighting of the source blocks is done with [highlight.js](https://highlightjs.org/#usage).
+
+Backreferences are also handled here, because at this stage, all `doc:doc`-elements of all included stylesheets are available for lookup.
     </doc:desc>
   </doc:doc>
 
 
   <xsl:mode name="html" on-no-match="shallow-skip" />
-  <xsl:mode name="toc" on-no-match="shallow-skip" />
 
   <xsl:key name="docById" match="doc:doc" use="@id" />
+  <xsl:key name="refByRef" match="doc:doc" use="doc:references/@ref" />
 
+  <!-- HTML-header data for all result documents -->
   <xsl:variable name="htmlHeadCommon">
-    <!-- <link rel="stylesheet" type="text/css" href="assets/css/style.css" /> -->
-    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous" /> -->
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.pumpkin.min.css" />
     <!--Highlight.js: https://highlightjs.org/usage/-->
       <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.3.1/styles/dark.min.css" />
@@ -41,10 +42,12 @@ The highlighting of the source blocks is done with [highlight.js](https://highli
     <script type="module" src="https://md-block.verou.me/md-block.js"></script>
   </xsl:variable>
 
+  <!-- Entry point for transformation to HTML. -->
   <xsl:template match="doc:Doc" mode="html">
     <html>
       <xsl:call-template name="createHtmlHead" />
       <body>
+        <xsl:call-template name="navbar" />
         <xsl:call-template name="createToc" />
         <xsl:apply-templates mode="html" />
         <xsl:sequence select="$htmlBodyScripts" />
@@ -61,7 +64,7 @@ The highlighting of the source blocks is done with [highlight.js](https://highli
       <meta name="generator" content="xslt-documentation-generator" />
       <xsl:choose>
         <xsl:when test="doc:doc[@scope='global'][doc:title]">
-          <title>{doc:doc[@scope='global'][doc:title]}</title>
+          <title>{doc:doc[@scope='global']/doc:title}</title>
         </xsl:when>
         <xsl:when test="doc:doc[@scope='stylesheet'][doc:title]">
           <title>{doc:doc[@scope='stylesheet']/doc:title}</title>
@@ -75,6 +78,7 @@ The highlighting of the source blocks is done with [highlight.js](https://highli
     </head>
   </xsl:template>
 
+  <!-- Description at the global level. -->
   <xsl:template match="doc:doc[@scope='global']" mode="html">
     <div class="docBlock globalLevel" id="{escape-html-uri(@id)}">
       <h1>{if ($lang eq 'ger') then "Über" else "About"} {if (doc:title) then doc:title else
@@ -86,10 +90,15 @@ The highlighting of the source blocks is done with [highlight.js](https://highli
   <!-- Documentation at stylesheet level. -->
   <xsl:template match="doc:doc[@scope='stylesheet']" mode="html">
     <div class="docBlock stylesheetLevel" id="{escape-html-uri(@id)}">
-      <h2>{if ($lang eq 'ger') then "Über" else "About"} {if (doc:title) then doc:title else doc:includedFrom/@href}</h2>
-      <xsl:if test="doc:includedFrom/@href ne ''">
-        <p>Included from {doc:includedFrom/@href}</p>
-      </xsl:if>
+      <div class="heading-container">
+        <h2>{if ($lang eq 'ger') then "Über" else "About"} {if (doc:title) then
+          doc:title else doc:includedFrom/@href}</h2>
+        <xsl:if test="doc:includedFrom/@href ne ''">
+        <p>Included from <a
+              href="#stylesheet;{escape-html-uri(doc:includedFrom/@href)}">
+            {doc:includedFrom/@href}</a></p>
+        </xsl:if>
+      </div>
       <xsl:apply-templates select="doc:desc" mode="html" />
       <xsl:if test="doc:param">
         <xsl:call-template name="renderParams" />
@@ -100,12 +109,15 @@ The highlighting of the source blocks is done with [highlight.js](https://highli
   <!-- Documentation on element level -->
   <xsl:template match="doc:doc" mode="html">
     <div class="docBlock elementLevel" id="{escape-html-uri(@id)}">
-      <h3>{doc:type}: <code>{doc:name}</code>
-                      {if (doc:match/text()) then "match: " else ""}
-                      <code>{doc:match}</code></h3>
-      <xsl:if test="doc:includedFrom/@href ne ''">
-        <p>Included from <a href="#stylesheet;{escape-html-uri(doc:includedFrom/@href)}">{doc:includedFrom/@href}</a></p>
-      </xsl:if>
+      <div class="heading-container">
+        <h3>{doc:dispLabel}</h3>
+        <xsl:if test="doc:includedFrom/@href ne ''">
+          <p>Included from <a
+              href="#stylesheet;{escape-html-uri(doc:includedFrom/@href)}">
+            {doc:includedFrom/@href}</a></p>
+        </xsl:if>
+      </div>
+
       <xsl:apply-templates mode="html" />
       <xsl:if test="doc:param">
         <xsl:call-template name="renderParams" />
@@ -113,15 +125,23 @@ The highlighting of the source blocks is done with [highlight.js](https://highli
       <xsl:if test="doc:return">
         <xsl:call-template name="renderReturn" />
       </xsl:if>
-      <xsl:if test="doc:references">
-        <xsl:call-template name="renderRef">
-          <xsl:with-param name="refType" select="'references'" />
-        </xsl:call-template>
-      </xsl:if>
-      <xsl:if test="doc:referencedBy">
-        <xsl:call-template name="renderRef">
-          <xsl:with-param name="refType" select="'referencedBy'" />
-        </xsl:call-template>
+      <!-- References -->
+      <xsl:variable name="refs">
+        <xsl:if test="doc:references">
+          <xsl:call-template name="renderRef" />
+        </xsl:if>
+        <xsl:call-template name="renderBackrefs" />
+      </xsl:variable>
+      <xsl:if test="$refs">
+        <xsl:choose>
+          <xsl:when test="$lang eq 'eng'">
+            <h4>References</h4>
+          </xsl:when>
+          <xsl:otherwise>
+            <h4>Referenzen</h4>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:sequence select="$refs" />
       </xsl:if>
       <xsl:call-template name="renderSource" />
     </div>
@@ -143,9 +163,7 @@ The highlighting of the source blocks is done with [highlight.js](https://highli
     <p><b>{if ($lang eq 'eng') then "Context" else "Kontext"}: </b> <code>{.}</code></p>
   </xsl:template>
 
-  <!--
-      Render the parameter list as table.
-  -->
+  <!-- Render the parameter list as table. -->
   <xsl:template name="renderParams">
     <h4>{if ($lang eq 'ger') then "Parameter" else "Parameters"}</h4>
     <table class="table">
@@ -169,18 +187,16 @@ The highlighting of the source blocks is done with [highlight.js](https://highli
       </thead>
       <xsl:for-each select="doc:param">
         <tr>
-          <td>{@name}</td>
-          <td>{@as}</td>
-          <td>{@required}</td>
+          <td><code>{@name}</code></td>
+          <td><code>{@as}</code></td>
+          <td><code>{@required}</code></td>
           <td><md-span>{.}</md-span></td>
         </tr>
       </xsl:for-each>
     </table>
   </xsl:template>
 
-  <!--
-      Render the return vaue as table.
-  -->
+  <!-- Render the return vaue as table. -->
   <xsl:template name="renderReturn">
     <h4>{if ($lang eq 'eng') then 'Return Value' else 'Rückgabewert'}</h4>
     <table class="table">
@@ -210,18 +226,10 @@ The highlighting of the source blocks is done with [highlight.js](https://highli
   <!--
       Render references as table
 
-@referencedBy temp;nil;doc:doc;html Wird vom template für Element-Dokumentation aufgerufen.
+      @referencedBy temp;doc:doc;html Wird vom template für Element-Dokumentation aufgerufen.
   -->
   <xsl:template name="renderRef">
-    <xsl:param name="refType" required="yes" />
-    <xsl:choose>
-      <xsl:when test="$lang eq 'eng'">
-        <h4>{if ($refType eq "references") then "Referenziert" else "Referenziert von"}</h4>
-      </xsl:when>
-      <xsl:otherwise>
-        <h4>{if ($refType eq "references") then "Referenziert" else "Referenziert von"}</h4>
-      </xsl:otherwise>
-    </xsl:choose>
+    <xsl:variable name="id" select="@id" />
 
     <table class="table">
       <thead>
@@ -237,7 +245,7 @@ The highlighting of the source blocks is done with [highlight.js](https://highli
             </xsl:otherwise>
           </xsl:choose>        </tr>
       </thead>
-      <xsl:for-each select="if ($refType eq 'references') then doc:references else doc:referencedBy">
+      <xsl:for-each select="doc:references">
         <tr>
           <td><a href="#{escape-html-uri(@ref)}">{key('docById', @ref)/doc:dispLabel}</a></td>
           <td>{.}</td>
@@ -247,31 +255,99 @@ The highlighting of the source blocks is done with [highlight.js](https://highli
   </xsl:template>
 
   <!--
-      Create a table of contents for the HTML result
+      Get backreferences and render them.
+
+      Searching for backreferences is done here, as they might not be reachable in the collecting phase.
   -->
+  <xsl:template name="renderBackrefs">
+    <xsl:variable name="selfId" select="@id" />
+    <xsl:variable name="docdBackrefs" select="doc:referencedBy" />
+    <xsl:variable name="collectedBackrefs" select="key('refByRef', $selfId)" />
+
+   <xsl:if test="exists($docdBackrefs | $collectedBackrefs)">
+      <table class="table">
+        <thead>
+          <tr>
+            <xsl:choose>
+              <xsl:when test="$lang eq 'eng'">
+                <td>Referenced by</td>
+              <td>Comment</td>
+              </xsl:when>
+              <xsl:otherwise>
+                <td>Referenz</td>
+              <td>Anmerkung</td>
+              </xsl:otherwise>
+            </xsl:choose>
+          </tr>
+        </thead>
+        <xsl:for-each select="doc:referencedBy">
+          <tr>
+            <td>
+              <a href="#{escape-html-uri(@ref)}">{key('docById', @ref)/doc:dispLabel}</a>
+            </td>
+            <td>{.}</td>
+          </tr>
+        </xsl:for-each>
+        <xsl:for-each
+          select="$collectedBackrefs[not(@id=($selfId, $docdBackrefs/@ref))]">
+          <tr>
+            <td>
+              <a href="#{escape-html-uri(@id)}">{doc:dispLabel}</a>
+            </td>
+            <td />
+          </tr>
+        </xsl:for-each>
+      </table>
+    </xsl:if>
+  </xsl:template>
+
+  <!-- Create a table of contents for the HTML result -->
   <xsl:template name="createToc">
-    <h1>{if ($lang eq 'eng') then 'Table of Contents' else 'Inhaltsverzeichnis'}</h1>
-    <ul>
-      <xsl:for-each-group select="doc:doc"
-                          group-by="doc:includedFrom/@href">
-        <xsl:variable name="stylesheetDoc" select="current-group()[@scope='stylesheet']" />
-        <xsl:variable name="elementDoc" select="current-group()[@scope='element' or not(@scope)]" />
+    <div id="toc">
+      <h1>{if ($lang eq 'eng') then 'Table of Contents' else 'Inhaltsverzeichnis'}</h1>
+      <ul>
+        <xsl:if test="doc:doc[@scope='global']">
+          <xsl:variable name="globalDocs" select="doc:doc[@scope='global']" />
+         <xsl:for-each select="$globalDocs">
+            <li>
+              <a href="#{escape-html-uri(@id)}">{
+                if (doc:title) then doc:title
+                else
+                  if ($lang eq 'eng') then 'General Information' else 'Allgemeines'
+                }</a>
+            </li>
+          </xsl:for-each>
+        </xsl:if>
+        <xsl:for-each-group select="doc:doc"
+          group-by="doc:includedFrom/@href">
+          <xsl:variable name="stylesheetDoc"
+            select="current-group()[@scope='stylesheet']" />
+        <xsl:variable
+            name="elementDoc"
+            select="current-group()[@scope='element' or not(@scope)]" />
         <ul>
-          <li><a href="#{escape-html-uri($stylesheetDoc/@id)}">{if (doc:title) then doc:title else doc:includedFrom/@href }</a></li>
-          <ul>
-            <xsl:for-each select="$elementDoc">
-              <li><a href="#{escape-html-uri(@id)}">{doc:dispLabel}</a></li>
-            </xsl:for-each>
+            <li>
+              <a href="#{escape-html-uri($stylesheetDoc/@id)}">{if ($stylesheetDoc/doc:title)
+              then $stylesheetDoc/doc:title else $stylesheetDoc/doc:includedFrom/@href
+              }</a>
+            </li>
+            <ul>
+              <xsl:for-each select="$elementDoc">
+                <li>
+                  <a href="#{escape-html-uri(@id)}">{doc:dispLabel}</a>
+                </li>
+              </xsl:for-each>
+            </ul>
           </ul>
-        </ul>
-      </xsl:for-each-group>
-    </ul>
+        </xsl:for-each-group>
+      </ul>
+    </div>
   </xsl:template>
 
   <!--
       Render source code.
 
-      Source code is rendered into an accordion, collapsed by default. Syntax highlighting is done by `higlight.js`. See [the `head` of the HTML](#temp;createHtmlHead;nil;nil)
+      Source code is rendered into an accordion, collapsed by default. Syntax highlighting is done by `higlight.js`. See [the `head` of the HTML](#temp;createHtmlHead)
       for inclusion of `highlight.js`.
   -->
   <xsl:template name="renderSource">
@@ -287,11 +363,45 @@ The highlighting of the source blocks is done with [highlight.js](https://highli
   <!--
       Empty template matching `doc:src`. The rendering of source code is done by a named template.
 
-      @references temp;renderSource;nil;nil Named template rendering `doc:src` elements.
+      @references temp;renderSource Named template rendering `doc:src` elements.
   -->
   <xsl:template match="doc:src" mode="html" />
 
+  <!--
+      Create a navbar
+
+      @context doc:Doc
+  -->
+  <xsl:template name="navbar">
+    <xsl:variable name="title">
+      <xsl:choose>
+        <xsl:when test="doc:doc[@scope='global'][doc:title]">
+          <title>{doc:doc[@scope='global']/doc:title}</title>
+        </xsl:when>
+        <xsl:otherwise>
+          <!-- take file name -->
+          <title>Documentation for {base-uri() => replace("^.*/", "")}</title>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <nav>
+      <ul>
+        <li><strong>{$title}</strong></li>
+      </ul>
+      <ul>
+        <li><a href="#toc">{if ($lang eq 'eng') then 'Table of Contents' else 'Inhaltsverzeichnis'}</a></li>
+      </ul>
+    </nav>
+  </xsl:template>
+
+  <!--
+      Create an HTML tree with a table of contents, linking to the individual docs.
+
+      @context: absent
+  -->
   <xsl:template name="createDocIndex">
+    <xsl:context-item use="absent" />
     <xsl:param name="config" required="yes" />
     <xsl:param name="docDir" required="yes" />
         <html>

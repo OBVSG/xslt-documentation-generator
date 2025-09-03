@@ -7,15 +7,20 @@
   <!--
     Create an id for a documented element.
 
+    The structure of the ids is as follows:
+
+    - for named templates: `temp;{@name}` (a `match`-attribute is ignored if there is a `name`-attribute)
+    - for match templates: `temp;{@match};{@mode}` (`nil` for the mode if no `mode`-attribute ist present)
+    - for functions: `func;{@name}`
+
     @context xsl:template|xsl:function
   -->
   <xsl:template name="createId">
-    <xsl:sequence>{
-      substring(local-name(), 1, 4) || ";"
-      || (if (@name) then @name else 'nil') || ";"
-      || (if (@match) then @match else 'nil') || ";"
-      || (if (@mode) then @mode else 'nil')
-    }</xsl:sequence>
+    <xsl:choose>
+      <xsl:when test="local-name() eq 'template' and @name">temp;{@name}</xsl:when>
+      <xsl:when test="local-name() eq 'template' and @match">temp;{@match};{if (@mode) then @mode else "nil"}</xsl:when>
+      <xsl:when test="local-name() eq 'function'">func;{@name}</xsl:when>
+    </xsl:choose>
   </xsl:template>
 
   <!--

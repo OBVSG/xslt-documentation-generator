@@ -3,7 +3,11 @@
 
   <doc:doc scope="stylesheet">
     <doc:title>collect.xsl</doc:title>
-    <doc:desc>This stylesheet holds templates and functions needed to populate a `doc:Doc`-document from an XSLT-Stlyesheet. This document is intended for further processing into other formats like HTML.</doc:desc>
+    <doc:desc>This stylesheet holds templates and functions needed to populate a `doc:Doc`-document from an XSLT-Stlyesheet.
+
+This document is intended for further processing into other formats like HTML. Backreferences are handled in [html.xsl](#stylesheet;html.xsl).
+This is because not all elements of a project are available simultaneously at this stage and references to templates or
+functions declared in another file would not be found.</doc:desc>
   </doc:doc>
 
   <xsl:mode name="collect" on-no-match="shallow-skip" />
@@ -14,13 +18,16 @@
     <xsl:param name="id"
                select="(@scope,
                        if ($includedFrom) then $includedFrom else replace(base-uri(), '^.*/', ''))
-                       => string-join(';')"
-               />
+                       => string-join(';')" />
       <doc:doc scope="{@scope}" id="{$id}">
         <doc:includedFrom href="{$includedFrom}" />
-        <xsl:sequence select="*" />
+        <xsl:if test="doc:includeMd">
+          <doc:desc>
+            <xsl:apply-templates select="doc:includeMd" mode="collect" />
+          </doc:desc>
+        </xsl:if>
+      <xsl:sequence select="*[not(doc:includeMd)]" />
       </doc:doc>
-
   </xsl:template>
 
   <!--
@@ -31,6 +38,7 @@
       definition.
 
       @param includedFrom Path to the stylesheet that included this one with `xsl:include`
+      @references temp;createId Create ID for this documentation element
   -->
   <xsl:template match="xsl:template|xsl:function" mode="collect">
     <xsl:param name="includedFrom" as="xs:string" />
@@ -54,6 +62,16 @@
       </xsl:if>
       <doc:type>{local-name()}</doc:type>
       <xsl:call-template name="displayLabel" />
+      <xsl:if test="not($docForElement/doc:doc/doc:desc/text())">
+        <doc:desc>{
+          if ($lang eq 'eng') then '*[No description available]*' else '*[Keine Beschreibung verfügbar]*'
+        }</doc:desc>
+      </xsl:if>
+      <xsl:if test="$docForElement/doc:doc/doc:includeMd">
+        <doc:desc>
+          <xsl:apply-templates select="doc:includeMd" mode="collect" />
+        </doc:desc>
+      </xsl:if>
       <xsl:sequence select="$docForElement/doc:doc/doc:desc" />
       <xsl:sequence select="$docForElement/doc:doc/doc:context" />
       <xsl:call-template name="collectParams">
@@ -64,7 +82,9 @@
           <xsl:with-param name="returnFromDoc" select="$docForElement/doc:doc/doc:return" />
         </xsl:call-template>
       </xsl:if>
-      <xsl:sequence select="$docForElement/doc:doc/doc:references" />
+      <xsl:call-template name="collectReferences">
+        <xsl:with-param name="refFromDoc" select="$docForElement/doc:doc/doc:references" />
+      </xsl:call-template>
       <xsl:sequence select="$docForElement/doc:doc/doc:referencedBy" />
       <doc:src>
         <xsl:sequence select="." />
@@ -77,7 +97,6 @@
       directly preceding this element.
 
       @context xsl:function|xsl:template
-      @references func;utils:docFromString;nil;nil
   -->
   <xsl:template name="getDocForElement">
     <xsl:choose>
@@ -125,6 +144,36 @@
         <xsl:text>{$fromDoc/text()}</xsl:text>
       </doc:param>
     </xsl:for-each>
+  </xsl:template>
+
+  <!--
+      Collect and aggregate information about references (outgoing) from the element itself and
+      it's documentation.
+
+      @context xsl:element|xsl:function
+      @param refFromDoc The documentation fetched from `doc:doc` or a preceeding comment.
+  -->
+  <xsl:template name="collectReferences">
+    <xsl:param name="refFromDoc" as="element(doc:references)*" />
+    <xsl:variable name="referencedTemplates">
+      <xsl:for-each  select=".//xsl:call-template ! ('temp;' || @name)">
+        <xsl:if test="not($refFromDoc/@ref=.)">
+          <doc:references ref="{.}" />
+        </xsl:if>
+      </xsl:for-each>
+    </xsl:variable>
+    <xsl:variable name="referencedFunctions">
+      <xsl:for-each select="(.//@select | .)
+                            ! analyze-string(., '([a-zA-Z]+:[a-zA-Z_-]+)\(')/fn:match/fn:group/string()
+                            ! ('func;' || .)
+                            => distinct-values()">
+        <xsl:if test="not($refFromDoc/@ref=.)">
+          <doc:references ref="{.}" />
+        </xsl:if>
+      </xsl:for-each>
+    </xsl:variable>
+
+    <xsl:sequence select="($refFromDoc, $referencedTemplates, $referencedFunctions)" />
   </xsl:template>
 
   <!--
@@ -213,6 +262,15 @@
       </xsl:iterate>
     </doc:doc>
   </xsl:function>
+
+  <!--
+      Include Markdown from file.
+  -->
+  <xsl:template match="doc:includeMd" mode="collect">
+    <xsl:if test="unparsed-text-available(@href)">
+      <xsl:sequence select="unparsed-text(@href)" />
+    </xsl:if>
+  </xsl:template>
 
   <!--
       Dedent a multiline string by the indentation amount of the first line.

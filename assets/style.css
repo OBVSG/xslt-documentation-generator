@@ -11,6 +11,32 @@ body {
     width: 80%;
 }
 
+nav {
+    position: fixed;
+    top: 0px;
+    width: 90%;
+    background-color: rgb(19, 22.5, 30.5);
+    border-bottom: 2px solid #ffa23a;
+}
+
+p {
+    margin-bottom: 0.6rem;
+}
+
+div {
+    scroll-margin-top: 100px;
+}
+
+.heading-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.includedFrom p{
+    font-size: smaller;
+    text-align: right;
+}
 .docBlock {
     margin-top: 50px;
 }
