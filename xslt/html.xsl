@@ -22,7 +22,6 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
 
 
   <xsl:mode name="html" on-no-match="shallow-skip" />
-  <xsl:mode name="toc" on-no-match="shallow-skip" />
 
   <xsl:key name="docById" match="doc:doc" use="@id" />
   <xsl:key name="refByRef" match="doc:doc" use="doc:references/@ref" />
@@ -307,6 +306,18 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
     <div id="toc">
       <h1>{if ($lang eq 'eng') then 'Table of Contents' else 'Inhaltsverzeichnis'}</h1>
       <ul>
+        <xsl:if test="doc:doc[@scope='global']">
+          <xsl:variable name="globalDocs" select="doc:doc[@scope='global']" />
+         <xsl:for-each select="$globalDocs">
+            <li>
+              <a href="#{escape-html-uri(@id)}">{
+                if (doc:title) then doc:title
+                else
+                  if ($lang eq 'eng') then 'General Information' else 'Allgemeines'
+                }</a>
+            </li>
+          </xsl:for-each>
+        </xsl:if>
         <xsl:for-each-group select="doc:doc"
           group-by="doc:includedFrom/@href">
           <xsl:variable name="stylesheetDoc"
@@ -316,8 +327,9 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
             select="current-group()[@scope='element' or not(@scope)]" />
         <ul>
             <li>
-              <a href="#{escape-html-uri($stylesheetDoc/@id)}">{if (doc:title)
-          then doc:title else doc:includedFrom/@href }</a>
+              <a href="#{escape-html-uri($stylesheetDoc/@id)}">{if ($stylesheetDoc/doc:title)
+              then $stylesheetDoc/doc:title else $stylesheetDoc/doc:includedFrom/@href
+              }</a>
             </li>
             <ul>
               <xsl:for-each select="$elementDoc">

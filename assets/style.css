@@ -16,10 +16,15 @@ nav {
     top: 0px;
     width: 90%;
     background-color: rgb(19, 22.5, 30.5);
+    border-bottom: 2px solid #ffa23a;
 }
 
 p {
     margin-bottom: 0.6rem;
+}
+
+div {
+    scroll-margin-top: 100px;
 }
 
 .heading-container {

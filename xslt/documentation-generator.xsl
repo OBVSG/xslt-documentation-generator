@@ -8,7 +8,7 @@
 
 
   <doc:doc scope="stylesheet">
-    <doc:title>Main stylesheet for XSLT Documentation Generator</doc:title>
+    <doc:title>documentation-generator.xsl</doc:title>
     <doc:desc>This is the main stylesheet for the `documentation-generator`.
 
 It runs the transformation to get an intermediary XML-Document in the `doc:*` namespace which is further processed to output HTML5.

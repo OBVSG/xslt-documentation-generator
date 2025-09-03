@@ -5,9 +5,9 @@
     <doc:title>collect.xsl</doc:title>
     <doc:desc>This stylesheet holds templates and functions needed to populate a `doc:Doc`-document from an XSLT-Stlyesheet.
 
-    This document is intended for further processing into other formats like HTML. Backreferences are handled in `html.xsl`.
-    This is because not all elements of a project are available simultaneously at this stage and references to templates or
-    functions declared in another file would not be found.</doc:desc>
+This document is intended for further processing into other formats like HTML. Backreferences are handled in [html.xsl](#stylesheet;html.xsl).
+This is because not all elements of a project are available simultaneously at this stage and references to templates or
+functions declared in another file would not be found.</doc:desc>
   </doc:doc>
 
   <xsl:mode name="collect" on-no-match="shallow-skip" />
