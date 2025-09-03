@@ -267,9 +267,14 @@ functions declared in another file would not be found.</doc:desc>
       Include Markdown from file.
   -->
   <xsl:template match="doc:includeMd" mode="collect">
-    <xsl:if test="unparsed-text-available(@href)">
-      <xsl:sequence select="unparsed-text(@href)" />
-    </xsl:if>
+    <xsl:variable name="pwd" select="base-uri() =&gt; replace('[^/]+$', '')" />
+    <xsl:variable name="inclAbsPath" select="if (starts-with(@href, 'http:')) then @href else $pwd || @href" />
+    <xsl:choose>
+      <xsl:when test="unparsed-text-available($inclAbsPath)">
+        <xsl:sequence select="unparsed-text($inclAbsPath)" />
+      </xsl:when>
+      <xsl:otherwise>**FILE NOT FOUND: {$inclAbsPath}**</xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <!--
