@@ -44,7 +44,7 @@ Negative relative indent (0 spaces from left)</doc:desc>
     @context marc:datafield
     @param documentedParam A param that is very well documented
     @param undocumentedParam
-    @returns documentation of the return value
+    @return documentation of the return value
     @references temp;datafield[@tag='245'];nil Template that matches the title field
     @referencedBy temp;dummyTemplate;nil;dummyMode
         </x:param>
@@ -55,7 +55,7 @@ Negative relative indent (0 spaces from left)</doc:desc>
           <doc:context>marc:datafield</doc:context>
           <doc:param name="documentedParam">A param that is very well documented</doc:param>
           <doc:param name="undocumentedParam" />
-          <doc:returns>documentation of the return value</doc:returns>
+          <doc:return>documentation of the return value</doc:return>
           <doc:references ref="temp;datafield[@tag='245'];nil">Template that matches the title field</doc:references>
           <doc:referencedBy ref="temp;dummyTemplate;nil;dummyMode" />
         </doc:doc>

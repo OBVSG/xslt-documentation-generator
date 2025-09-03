@@ -184,7 +184,7 @@ functions declared in another file would not be found.</doc:desc>
     If the return type of the documentation doesn't match @as of the function, throw an error message and terminate.
     If the return type is documented, but not declared in the function declaration, throw a warning. In this case, the return type from the documentation is used.
 
-    @param returnFromDoc `doc:return-element` from `doc:doc` corresponding to the function to document
+    @param returnFromDoc `doc:return`-element from `doc:doc` corresponding to the function to document
   -->
   <xsl:template name="docReturn">
     <xsl:param name="returnFromDoc" as="element(doc:return)?" />
@@ -248,7 +248,7 @@ functions declared in another file would not be found.</doc:desc>
             <doc:param name="{tokenize(.)[2]}">{replace(., "^param \S+", "") => normalize-space()}</doc:param>
           </xsl:when>
           <xsl:when test="starts-with(., 'returns')">
-            <doc:returns>{replace(., "^returns ", "") => normalize-space()}</doc:returns>
+            <doc:return>{replace(., "^return ", "") => normalize-space()}</doc:return>
           </xsl:when>
           <xsl:when test="starts-with(., 'references') or starts-with(., 'referencedBy')">
             <xsl:variable name="name" select="tokenize(.)[1]" />

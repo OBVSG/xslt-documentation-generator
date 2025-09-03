@@ -33,7 +33,7 @@
   </xsl:template>
 
   <doc:doc>
-    <doc:return>Dokumentation eines Funktions-Rückgabewerts</doc:return>
+    <doc:return>Dokumentation eines Funktions-Rückgabewerts</doc:returns>
   </doc:doc>
   <xsl:function name="dummyFunction" as="xs:string">
     <xsl:value-of select="'hallo'" />
