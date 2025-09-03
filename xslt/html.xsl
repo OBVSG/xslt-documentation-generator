@@ -401,19 +401,55 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
   -->
   <xsl:template name="createDocIndex">
     <xsl:context-item use="absent" />
+    <xsl:param name="title" select="''" />
     <xsl:param name="config" required="yes" />
     <xsl:param name="docDir" required="yes" />
+    <xsl:param name="readme" />
         <html>
           <head>
             <xsl:sequence select="$htmlHeadCommon" />
           </head>
           <body>
-            <h1>Inhaltsverzeichnis</h1>
+            <nav>
+              <ul>
+                <li>
+                  <strong>{$title}</strong>
+                </li>
+              </ul>
+              <ul>
+                <li>
+                  <a href="#toc">{if ($lang eq 'eng') then 'Table of Contents' else
+                  'Inhaltsverzeichnis'}</a>
+                </li>
+              </ul>
+            </nav>
+
+            <h1 id="toc">Inhaltsverzeichnis</h1>
             <ul>
-              <xsl:for-each select="$config/config:normalization">
-                <li><a href="{@distName}/index.html">{@name}</a></li>
-              </xsl:for-each>
+              <xsl:if test="$readme">
+                <li><a href="#readme">Readme</a></li>
+              </xsl:if>
+              <li>{if ($lang eq 'eng') then 'Documented Transformations' else 'Dokumentierte Transformationen'}</li>
+              <ul>
+                <xsl:for-each select="$config/config:normalization">
+                  <li>
+                    <a href="{@distName}/index.html">{@name}</a>
+                  </li>
+                </xsl:for-each>
+              </ul>
             </ul>
+            <xsl:if test="$readme">
+              <div id="readme">
+                <md-block>
+                  <xsl:choose>
+                    <xsl:when test="unparsed-text-available($readme)">
+                      <xsl:sequence select="unparsed-text($readme)" />
+                    </xsl:when>
+                    <xsl:otherwise>**FILE NOT FOUND: {$readme}**</xsl:otherwise>
+                  </xsl:choose>
+                </md-block>
+              </div>
+            </xsl:if>
             <xsl:sequence select="$htmlBodyScripts" />
           </body>
         </html>

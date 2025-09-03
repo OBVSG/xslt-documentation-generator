@@ -41,7 +41,7 @@ saxon-xslt -xsl:xslt-documentation-generator/xslt/documentation-generator.xsl -i
   <xsl:mode on-no-match="shallow-skip" />
   <xsl:mode name="collect" on-no-match="shallow-skip" />
 
-  <xsl:param name="lang" select="ger" as="xs:string" />
+  <xsl:param name="lang" select="'ger'" as="xs:string" />
   <xsl:param name="configFile" as="xs:string" />
 
   <xsl:preserve-space elements="doc:desc" />
@@ -62,13 +62,18 @@ saxon-xslt -xsl:xslt-documentation-generator/xslt/documentation-generator.xsl -i
     </xsl:if>
 
     <xsl:variable name="config"
-                  select="doc($configFile)/config:config/config:normalizations" />
+                  select="doc($configFile)/config:config" />
+    <xsl:variable name="normalizationConfig"
+                  select="$config/config:normalizations" />
+    <xsl:variable name="docConfig"
+                  select="$config/config:documentation" />
     <xsl:variable name="projectRoot">{
       base-uri($config)
       => replace("^file:", "")
       => replace("[^/]+$", "")
     }</xsl:variable>
-    <xsl:variable name="docDir" select="$projectRoot || 'docs/'" />
+    <xsl:variable name="docDir"
+                  select="if ($docConfig/docDir) then $projectRoot || $docConfig/docDir else $projectRoot || 'docs/'" />
     <!-- Make index file -->
     <xsl:result-document href="{$docDir}/index.html"
                          method="html"
@@ -77,13 +82,15 @@ saxon-xslt -xsl:xslt-documentation-generator/xslt/documentation-generator.xsl -i
                          indent="no">
 
       <xsl:call-template name="createDocIndex">
-        <xsl:with-param name="config" select="$config" />
+        <xsl:with-param name="title" select="$config/config:projectInfo/config:name" />
+        <xsl:with-param name="config" select="$normalizationConfig" />
         <xsl:with-param name="docDir" select="$docDir" />
+        <xsl:with-param name="readme" select="$projectRoot || $docConfig/config:readme/@href" />
       </xsl:call-template>
     </xsl:result-document>
 
     <!-- Create document for the stylesheets -->
-    <xsl:for-each select="$config/config:normalization">
+    <xsl:for-each select="$normalizationConfig/config:normalization">
       <xsl:result-document href="{$docDir || @distName || '/index.html'}">
         <xsl:apply-templates select="doc($projectRoot || @main)" />
       </xsl:result-document>
