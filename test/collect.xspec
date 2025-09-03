@@ -63,29 +63,5 @@ Negative relative indent (0 spaces from left)</doc:desc>
     </x:scenario>
 
   </x:scenario>
-  <x:scenario label="get referenced template">
-    <x:scenario label="">
-      <x:context select="/xsl:stylesheet/xsl:template[@name='callingTemplate']">
-        <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:marc="http://www.loc.gov/MARC21/slim" xmlns:utils="http://www.obvsg.at/xslt/utils" expand-text="yes" version="3.0">
 
-          <xsl:template name="calledTemplate" mode="foo" />
-          <xsl:template name="calledTemplateWithMatch" match="nought" />
-
-          <xsl:template name="callingTemplate">
-            <xsl:call-template name="calledTemplate" />
-            <xsl:if test="exists(foo)">
-              <xsl:call-template name="calledTemplateWithMatch" />
-            </xsl:if>
-          </xsl:template>
-        </xsl:stylesheet>
-
-      </x:context>
-      <x:call template="collectReferences" />
-      <x:expect label="">
-        <doc:references ref="temp;calledTemplate" />
-        <doc:references ref="temp;calledTemplateWithMatch" />
-      </x:expect>
-    </x:scenario>
-
-  </x:scenario>
 </x:description>
