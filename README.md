@@ -32,7 +32,7 @@ So the following comment:
 <!-- 
     Create foo out of bar
     
-    @parem baz The baz to be fnorded
+    @param baz The baz to be fnorded
 -->
 ```
 
@@ -47,7 +47,7 @@ Is read as
 
 
 # Usage
-This stlysheet is intended to be used with Saxon from the command line. There are two ways to run it: Supplying a stylesheet to document and supplying a configuration file.
+This stylesheet is intended to be used with Saxon from the command line. There are two ways to run it: Supplying a stylesheet to document and supplying a configuration file.
 
 ## Parameters
 There are two parameters that can (or must) be passed to the transformation:
