@@ -305,42 +305,38 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
   <xsl:template name="createToc">
     <div id="toc">
       <h1>{if ($lang eq 'eng') then 'Table of Contents' else 'Inhaltsverzeichnis'}</h1>
-      <ul>
-        <xsl:if test="doc:doc[@scope='global']">
-          <xsl:variable name="globalDocs" select="doc:doc[@scope='global']" />
-         <xsl:for-each select="$globalDocs">
-            <li>
-              <a href="#{escape-html-uri(@id)}">{
-                if (doc:title) then doc:title
-                else
-                  if ($lang eq 'eng') then 'General Information' else 'Allgemeines'
-                }</a>
-            </li>
-          </xsl:for-each>
-        </xsl:if>
-        <xsl:for-each-group select="doc:doc"
-          group-by="doc:includedFrom/@href">
-          <xsl:variable name="stylesheetDoc"
-            select="current-group()[@scope='stylesheet']" />
-        <xsl:variable
-            name="elementDoc"
-            select="current-group()[@scope='element' or not(@scope)]" />
-        <ul>
-            <li>
-              <a href="#{escape-html-uri($stylesheetDoc/@id)}">{if ($stylesheetDoc/doc:title)
-              then $stylesheetDoc/doc:title else $stylesheetDoc/doc:includedFrom/@href
+      <xsl:if test="doc:doc[@scope='global']">
+        <xsl:variable name="globalDocs" select="doc:doc[@scope='global']" />
+          <xsl:for-each select="$globalDocs">
+          <li>
+            <a href="#{escape-html-uri(@id)}">{
+              if (doc:title) then doc:title
+              else
+              if ($lang eq 'eng') then 'General Information' else 'Allgemeines'
               }</a>
-            </li>
-            <ul>
-              <xsl:for-each select="$elementDoc">
-                <li>
-                  <a href="#{escape-html-uri(@id)}">{doc:dispLabel}</a>
-                </li>
-              </xsl:for-each>
-            </ul>
+          </li>
+        </xsl:for-each>
+      </xsl:if>
+      <xsl:for-each-group select="doc:doc" group-by="doc:includedFrom/@href">
+        <xsl:variable name="stylesheetDoc" select="current-group()[@scope='stylesheet']" />
+        <xsl:variable name="elementDoc" select="current-group()[@scope='element' or not(@scope)]" />
+        <ul>
+          <li>
+            <a href="#{escape-html-uri($stylesheetDoc/@id)}">{if
+        ($stylesheetDoc/doc:title)
+              then $stylesheetDoc/doc:title else
+        $stylesheetDoc/doc:includedFrom/@href
+              }</a>
+          </li>
+          <ul>
+            <xsl:for-each select="$elementDoc">
+              <li>
+                <a href="#{escape-html-uri(@id)}">{doc:dispLabel}</a>
+              </li>
+            </xsl:for-each>
           </ul>
-        </xsl:for-each-group>
-      </ul>
+        </ul>
+      </xsl:for-each-group>
     </div>
   </xsl:template>
 
@@ -379,8 +375,11 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
           <title>{doc:doc[@scope='global']/doc:title}</title>
         </xsl:when>
         <xsl:otherwise>
-          <!-- take file name -->
-          <title>Documentation for {base-uri() => replace("^.*/", "")}</title>
+          <title>{
+            if ($lang eq 'eng')
+            then 'Documentation for unnamed project'
+            else 'Dokumentation für unbenanntes Projekt'
+          }</title>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
