@@ -41,8 +41,8 @@ saxon-xslt -xsl:xslt-documentation-generator/xslt/documentation-generator.xsl -i
   <xsl:mode on-no-match="shallow-skip" />
   <xsl:mode name="collect" on-no-match="shallow-skip" />
 
-  <xsl:param name="lang" select="ger" />
-  <xsl:param name="configFile" />
+  <xsl:param name="lang" select="ger" as="xs:string" />
+  <xsl:param name="configFile" as="xs:string" />
 
   <xsl:preserve-space elements="doc:desc" />
 

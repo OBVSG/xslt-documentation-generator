@@ -18,6 +18,10 @@ nav {
     background-color: rgb(19, 22.5, 30.5);
 }
 
+p {
+    margin-bottom: 0.6rem;
+}
+
 .heading-container {
   display: flex;
   justify-content: space-between;
