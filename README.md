@@ -39,7 +39,7 @@ So the following comment:
 Is read as
 
 ``` xml
-<doc:doc xmlns:doc="http://www.obvsg.at/ns/doc">
+<doc:doc xmlns:doc="https://share.obvsg.at/xml/xsl/doc">
   <doc:desc>Create foo out of bar</doc:desc>
   <doc:param name="baz">The baz to be fnorded</doc:param>
 </doc:doc>

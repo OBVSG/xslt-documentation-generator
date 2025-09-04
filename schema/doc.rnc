@@ -1,4 +1,4 @@
-namespace doc = "http://www.obvsg.at/ns/doc"
+namespace doc = "http://www.obvsg.at/xml/xsl/doc"
 
 start = Doc
 Doc = element doc:Doc { doc* }
