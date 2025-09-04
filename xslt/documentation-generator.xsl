@@ -39,7 +39,6 @@ saxon-xslt -xsl:xslt-documentation-generator/xslt/documentation-generator.xsl -i
   <xsl:output method="html" version="5.0" encoding="UTF-8" indent="no" />
   <!-- <xsl:output indent="yes" /> -->
   <xsl:mode on-no-match="shallow-skip" />
-  <xsl:mode name="collect" on-no-match="shallow-skip" />
 
   <xsl:param name="lang" select="'ger'" as="xs:string" />
   <xsl:param name="configFile" as="xs:string" />

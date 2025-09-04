@@ -106,7 +106,16 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
     </div>
   </xsl:template>
 
-  <!-- Documentation on element level -->
+  <!--
+      Documentation on element level
+
+      This should match documentation for templates, functions and modes. It renderns the heading
+      and source code. The information specific to functions/templates and modes are rendered by
+      named templates.
+
+      @references temp;renderTempFunc Render information specific to `xsl:function` and `xsl:template` declarations.
+      @references temp;renderMode Render information specific to `xsl:mode` declarations.
+  -->
   <xsl:template match="doc:doc" mode="html">
     <div class="docBlock elementLevel" id="{escape-html-uri(@id)}">
       <div class="heading-container">
@@ -118,33 +127,66 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
         </xsl:if>
       </div>
 
-      <xsl:apply-templates mode="html" />
-      <xsl:if test="doc:param">
-        <xsl:call-template name="renderParams" />
-      </xsl:if>
-      <xsl:if test="doc:return">
-        <xsl:call-template name="renderReturn" />
-      </xsl:if>
-      <!-- References -->
-      <xsl:variable name="refs">
-        <xsl:if test="doc:references">
-          <xsl:call-template name="renderRef" />
-        </xsl:if>
-        <xsl:call-template name="renderBackrefs" />
-      </xsl:variable>
-      <xsl:if test="$refs">
-        <xsl:choose>
-          <xsl:when test="$lang eq 'eng'">
-            <h4>References</h4>
-          </xsl:when>
-          <xsl:otherwise>
-            <h4>Referenzen</h4>
-          </xsl:otherwise>
-        </xsl:choose>
-        <xsl:sequence select="$refs" />
-      </xsl:if>
+      <xsl:choose>
+        <xsl:when test="doc:type = ('function', 'template')">
+          <xsl:call-template name="renderTempFunc" />
+        </xsl:when>
+        <xsl:when test="doc:type = 'mode'">
+          <xsl:call-template name="renderMode" />
+        </xsl:when>
+      </xsl:choose>
       <xsl:call-template name="renderSource" />
     </div>
+  </xsl:template>
+
+  <!-- Render documentation specific to templates and functions. -->
+  <xsl:template name="renderTempFunc">
+    <xsl:apply-templates mode="html" />
+    <xsl:if test="doc:param">
+      <xsl:call-template name="renderParams" />
+    </xsl:if>
+    <xsl:if test="doc:return">
+      <xsl:call-template name="renderReturn" />
+    </xsl:if>
+    <!-- References -->
+    <xsl:variable name="refs">
+      <xsl:if test="doc:references">
+        <xsl:call-template name="renderRef" />
+      </xsl:if>
+      <xsl:call-template name="renderBackrefs" />
+    </xsl:variable>
+    <xsl:if test="$refs">
+      <xsl:choose>
+        <xsl:when test="$lang eq 'eng'">
+          <h4>References</h4>
+        </xsl:when>
+        <xsl:otherwise>
+          <h4>Referenzen</h4>
+        </xsl:otherwise>
+      </xsl:choose>
+      <xsl:sequence select="$refs" />
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="renderMode">
+    <xsl:apply-templates mode="html" />
+    <xsl:if test="doc:attribute[not(@name='name')]">
+      <h4>{if ($lang eq 'eng') then 'Attributes' else 'Attribute'}</h4>
+      <table>
+        <thead>
+          <tr>
+            <th>{if ($lang eq 'eng') then 'Attribute' else 'Attribut'}</th>
+            <th>{if ($lang eq 'eng') then 'Value' else 'Wert'}</th>
+          </tr>
+        </thead>
+        <xsl:for-each select="doc:attribute[not(@name='name')]">
+          <tr>
+            <td>{@name}</td>
+            <td>{@value}</td>
+          </tr>
+        </xsl:for-each>
+      </table>
+    </xsl:if>
   </xsl:template>
 
   <!--
@@ -166,21 +208,21 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
   <!-- Render the parameter list as table. -->
   <xsl:template name="renderParams">
     <h4>{if ($lang eq 'ger') then "Parameter" else "Parameters"}</h4>
-    <table class="table">
+    <table>
       <thead>
         <tr>
           <xsl:choose>
             <xsl:when test="$lang eq 'eng'">
-              <td>Name</td>
-              <td>Sequence type</td>
-              <td>required</td>
-              <td>Comment</td>
+              <th>Name</th>
+              <th>Sequence type</th>
+              <th>required</th>
+              <th>Comment</th>
             </xsl:when>
             <xsl:otherwise>
-              <td>Name</td>
-              <td>Sequenztyp</td>
-              <td>verpflichtend</td>
-              <td>Kommentar</td>
+              <th>Name</th>
+              <th>Sequenztyp</th>
+              <th>verpflichtend</th>
+              <th>Kommentar</th>
             </xsl:otherwise>
           </xsl:choose>
         </tr>

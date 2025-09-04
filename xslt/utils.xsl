@@ -20,6 +20,10 @@
       <xsl:when test="local-name() eq 'template' and @name">temp;{@name}</xsl:when>
       <xsl:when test="local-name() eq 'template' and @match">temp;{@match};{if (@mode) then @mode else "nil"}</xsl:when>
       <xsl:when test="local-name() eq 'function'">func;{@name}</xsl:when>
+      <xsl:when test="local-name() eq 'mode'">mode;{if (@name) then @name else 'unnamed'}</xsl:when>
+      <xsl:otherwise>
+          <xsl:message>{utils:format-message("error", ., "Unable to create id!")}</xsl:message>
+        </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 

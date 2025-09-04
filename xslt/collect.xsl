@@ -10,6 +10,7 @@ This is because not all elements of a project are available simultaneously at th
 functions declared in another file would not be found.</doc:desc>
   </doc:doc>
 
+  <!-- Mode to collect documentation about various XSLT-elements. -->
   <xsl:mode name="collect" on-no-match="shallow-skip" />
 
   <!-- Documentation at the global or stylesheet level -->
@@ -40,7 +41,7 @@ functions declared in another file would not be found.</doc:desc>
       @param includedFrom Path to the stylesheet that included this one with `xsl:include`
       @references temp;createId Create ID for this documentation element
   -->
-  <xsl:template match="xsl:template|xsl:function" mode="collect">
+  <xsl:template match="xsl:template|xsl:function|xsl:mode" mode="collect">
     <xsl:param name="includedFrom" as="xs:string" />
     <xsl:variable name="id">
       <xsl:call-template name="createId" />
@@ -86,6 +87,17 @@ functions declared in another file would not be found.</doc:desc>
         <xsl:with-param name="refFromDoc" select="$docForElement/doc:doc/doc:references" />
       </xsl:call-template>
       <xsl:sequence select="$docForElement/doc:doc/doc:referencedBy" />
+      <xsl:if test="local-name() eq 'mode'">
+        <xsl:for-each select="./attribute()">
+          <xsl:variable name="attName" select="name()" />
+        <xsl:variable
+            name="attFromDoc"
+            select="$docForElement/doc:doc/doc:attribute[@name=$attName]" />
+        <doc:attribute name="{name()}" value="{data()}">
+            <xsl:if test="$attFromDoc">{.}</xsl:if>
+          </doc:attribute>
+        </xsl:for-each>
+      </xsl:if>
       <doc:src>
         <xsl:sequence select="." />
       </doc:src>
@@ -216,14 +228,16 @@ functions declared in another file would not be found.</doc:desc>
         <xsl:when test="local-name() = 'template' and @name">Named template</xsl:when>
         <xsl:when test="local-name() = 'template'">Template</xsl:when>
         <xsl:when test="local-name() = 'function'">Function</xsl:when>
+        <xsl:when test="local-name() eq 'mode'">Mode</xsl:when>
         <xsl:otherwise>{local-name()}</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
     <doc:dispLabel>{
       $what
-      || (if (@name) then ' "' || @name || '"' else "")
+      || (if (@name) then ' "' || @name || '"'
+         else
+           if ($what eq 'Mode') then ' unnamed' else "")
       || (if (@match) then ', matching "' || @match || '"' else '')
-      || (if (@mode) then ', mode="' || @mode || '"' else '')
     }</doc:dispLabel>
   </xsl:template>
 
@@ -247,7 +261,7 @@ functions declared in another file would not be found.</doc:desc>
           <xsl:when test="starts-with(., 'param')">
             <doc:param name="{tokenize(.)[2]}">{replace(., "^param \S+", "") => normalize-space()}</doc:param>
           </xsl:when>
-          <xsl:when test="starts-with(., 'returns')">
+          <xsl:when test="starts-with(., 'return')">
             <doc:return>{replace(., "^return ", "") => normalize-space()}</doc:return>
           </xsl:when>
           <xsl:when test="starts-with(., 'references') or starts-with(., 'referencedBy')">
@@ -258,6 +272,12 @@ functions declared in another file would not be found.</doc:desc>
               <xsl:text>{replace(., "^" || $name || " \S+", "") => normalize-space()}</xsl:text>
             </xsl:element>
           </xsl:when>
+          <xsl:when test="starts-with(., 'attribute')">
+            <doc:attribute name="{tokenize(.)[2]}">{replace(., "^attribute", "") => normalize-space()}</doc:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:message>When parsing doc-comment: Encountered unknown property "@{.}". Ignoring.</xsl:message>
+          </xsl:otherwise>
         </xsl:choose>
       </xsl:iterate>
     </doc:doc>
