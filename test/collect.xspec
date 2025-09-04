@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <x:description xmlns:x="http://www.jenitennison.com/xslt/xspec"
-               xmlns:doc="https://share.obvsg.at/xml/xsl/doc" xmlns:utils="http://www.obvsg.at/xslt/utils"
+               xmlns:doc="https://share.obvsg.at/xml/xsl/doc" xmlns:utils="https://share.obvsg.at/xml/xsl/utils"
                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                stylesheet="../xslt/documentation-generator.xsl">
 
