@@ -21,6 +21,7 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
   </doc:doc>
 
 
+  <!-- Mode for rendering HTML. -->
   <xsl:mode name="html" on-no-match="shallow-skip" />
 
   <xsl:key name="docById" match="doc:doc" use="@id" />
@@ -168,6 +169,7 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
     </xsl:if>
   </xsl:template>
 
+  <!-- Render information specific to `xsl:mode` declarations. -->
   <xsl:template name="renderMode">
     <xsl:apply-templates mode="html" />
     <xsl:if test="doc:attribute[not(@name='name')]">
@@ -177,12 +179,14 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
           <tr>
             <th>{if ($lang eq 'eng') then 'Attribute' else 'Attribut'}</th>
             <th>{if ($lang eq 'eng') then 'Value' else 'Wert'}</th>
+            <th>{if ($lang eq 'eng') then 'Note' else 'Anmerkung'}</th>
           </tr>
         </thead>
         <xsl:for-each select="doc:attribute[not(@name='name')]">
           <tr>
             <td>{@name}</td>
             <td>{@value}</td>
+            <td>{.}</td>
           </tr>
         </xsl:for-each>
       </table>
@@ -201,6 +205,7 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
     </div>
   </xsl:template>
 
+  <!-- Render `doc:context` elements as HTML. -->
   <xsl:template match="doc:context" mode="html">
     <p><b>{if ($lang eq 'eng') then "Context" else "Kontext"}: </b> <code>{.}</code></p>
   </xsl:template>
@@ -398,6 +403,7 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
             </pre>
     </details>
   </xsl:template>
+
   <!--
       Empty template matching `doc:src`. The rendering of source code is done by a named template.
 

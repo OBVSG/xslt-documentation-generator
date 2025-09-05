@@ -10,7 +10,11 @@ This is because not all elements of a project are available simultaneously at th
 functions declared in another file would not be found.</doc:desc>
   </doc:doc>
 
-  <!-- Mode to collect documentation about various XSLT-elements. -->
+  <!--
+      Mode to collect documentation about various XSLT-elements.
+
+      @attribute on-no-match If there's no match, do nothing and continue matching for children.
+  -->
   <xsl:mode name="collect" on-no-match="shallow-skip" />
 
   <!-- Documentation at the global or stylesheet level -->
@@ -90,11 +94,11 @@ functions declared in another file would not be found.</doc:desc>
       <xsl:if test="local-name() eq 'mode'">
         <xsl:for-each select="./attribute()">
           <xsl:variable name="attName" select="name()" />
-        <xsl:variable
+          <xsl:variable
             name="attFromDoc"
             select="$docForElement/doc:doc/doc:attribute[@name=$attName]" />
-        <doc:attribute name="{name()}" value="{data()}">
-            <xsl:if test="$attFromDoc">{.}</xsl:if>
+          <doc:attribute name="{name()}" value="{data()}">
+            <xsl:if test="$attFromDoc">{$attFromDoc}</xsl:if>
           </doc:attribute>
         </xsl:for-each>
       </xsl:if>
@@ -273,7 +277,8 @@ functions declared in another file would not be found.</doc:desc>
             </xsl:element>
           </xsl:when>
           <xsl:when test="starts-with(., 'attribute')">
-            <doc:attribute name="{tokenize(.)[2]}">{replace(., "^attribute", "") => normalize-space()}</doc:attribute>
+            <xsl:variable name="name" select="tokenize(.)[2]" />
+            <doc:attribute name="{$name}">{replace(., "^attribute\s+" || $name, "") => normalize-space()}</doc:attribute>
           </xsl:when>
           <xsl:otherwise>
             <xsl:message>When parsing doc-comment: Encountered unknown property "@{.}". Ignoring.</xsl:message>

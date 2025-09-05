@@ -46,6 +46,9 @@
   </xsl:function>
 
 
+  <!--
+      Format messages for console output with `xsl:message`.
+  -->
   <xsl:function name="utils:format-message">
     <xsl:param name="severity" as="xs:string" />
     <xsl:param name="context" />
