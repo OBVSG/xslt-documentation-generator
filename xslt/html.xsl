@@ -33,7 +33,7 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
     <!--Highlight.js: https://highlightjs.org/usage/-->
       <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.3.1/styles/dark.min.css" />
       <xsl:if test="unparsed-text-available('../assets/css/style.css')">
-        <style>{unparsed-text('../assets/style.css')}</style>
+        <style>{unparsed-text('../assets/css/style.css')}</style>
       </xsl:if>
     <script src="https://unpkg.com/@highlightjs/cdn-assets@11.3.1/highlight.min.js"></script>
     <script>hljs.highlightAll();</script>
@@ -41,6 +41,9 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
 
   <xsl:variable name="htmlBodyScripts">
     <script type="module" src="https://md-block.verou.me/md-block.js"></script>
+    <!-- <xsl:if test="unparsed-text-available('../assets/js/minimal-theme-switcher.js')"> -->
+    <!--   <script>{unparsed-text('../assets/js/minimal-theme-switcher.js')}</script> -->
+    <!-- </xsl:if> -->
   </xsl:variable>
 
   <!-- Entry point for transformation to HTML. -->
@@ -438,6 +441,15 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
       </ul>
       <ul>
         <li><a href="#toc">{if ($lang eq 'en') then 'Table of Contents' else 'Inhaltsverzeichnis'}</a></li>
+        <li>
+          <label for="theme-switch">
+            <input type="checkbox"
+                   onclick="document.documentElement.setAttribute('data-theme', document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light')"
+                   id="theme-switch"
+                   name="dm-switch"
+                   role="switch" />
+          </label>
+        </li>
       </ul>
     </nav>
   </xsl:template>
