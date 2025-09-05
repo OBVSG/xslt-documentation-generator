@@ -8,7 +8,7 @@ docs:
   stage: docs
   script:
     - mkdir docs
-    - saxon-xslt -s:xslt/documentation-generator.xsl -xsl:xslt/documentation-generator.xsl lang=eng > docs/index.html
+    - saxon-xslt -s:xslt/documentation-generator.xsl -xsl:xslt/documentation-generator.xsl lang=en > docs/index.html
   artifacts:
     paths:
       - docs
@@ -43,7 +43,6 @@ deploy_development:
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" >> ~/.ssh/config'
     - cp "$SSH_KNOWN_HOSTS" ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
-
   script:
     - rsync -r -p docs/* obvsoft@galileo:/work/obvsoft/evol/apps/work_area/ss/xsldocs/xslt-documentation-generator
   only:
@@ -82,6 +81,5 @@ deploy_main:
 
   script:
     - rsync -r -p docs/* obvsoft@obelix:/var/www/vhosts/share.obvsg.at/htdocs/xsldocs/xslt-documentation-generator
-
   only:
     - main
