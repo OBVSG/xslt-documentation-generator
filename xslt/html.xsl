@@ -14,7 +14,7 @@ Some elements (notably `doc:desc`) can contain Markdown-markup. This is rendered
 
 Styling is done with [Pico CSS](https://picocss.com/), using the class-less version, so there are no framework-specific classes in the HTML output.
 
-The highlighting of the source blocks is done with [highlight.js](https://highlightjs.org/#usage).
+The highlighting of the source blocks is done with [Prism](https://prismjs.com).
 
 Backreferences are also handled here, because at this stage, all `doc:doc`-elements of all included stylesheets are available for lookup.
     </doc:desc>
@@ -35,15 +35,17 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
       <xsl:if test="unparsed-text-available('../assets/css/style.css')">
         <style>{unparsed-text('../assets/css/style.css')}</style>
       </xsl:if>
-    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.3.1/highlight.min.js"></script>
-    <script>hljs.highlightAll();</script>
+      <link href=" https://cdn.jsdelivr.net/npm/prismjs@1.30.0/themes/prism.min.css " rel="stylesheet" />
   </xsl:variable>
 
   <xsl:variable name="htmlBodyScripts">
     <script type="module" src="https://md-block.verou.me/md-block.js"></script>
-    <!-- <xsl:if test="unparsed-text-available('../assets/js/minimal-theme-switcher.js')"> -->
-    <!--   <script>{unparsed-text('../assets/js/minimal-theme-switcher.js')}</script> -->
-    <!-- </xsl:if> -->
+    <script src=" https://cdn.jsdelivr.net/npm/prismjs@1.30.0/prism.min.js "></script>
+  </xsl:variable>
+
+  <xsl:variable name="htmlFooter">
+    <footer>
+    </footer>
   </xsl:variable>
 
   <!-- Entry point for transformation to HTML. -->
