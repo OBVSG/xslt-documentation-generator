@@ -34,7 +34,7 @@ div {
   align-items: center;
 }
 
-.includedFrom p{
+.includedFrom {
     font-size: smaller;
     text-align: right;
 }

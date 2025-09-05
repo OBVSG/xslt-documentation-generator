@@ -45,7 +45,7 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
 
   <!-- Entry point for transformation to HTML. -->
   <xsl:template match="doc:Doc" mode="html">
-    <html>
+    <html lang="{if ($lang) then $lang else 'de'}">
       <xsl:call-template name="createHtmlHead" />
       <body>
         <xsl:call-template name="navbar" />
@@ -82,8 +82,8 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
   <!-- Description at the global level. -->
   <xsl:template match="doc:doc[@scope='global']" mode="html">
     <div class="docBlock globalLevel" id="{escape-html-uri(@id)}">
-      <h1>{if ($lang eq 'ger') then "Über" else "About"} {if (doc:title) then doc:title else
-        if ($lang eq 'ger') then "diese Applikation" else "this Application"}</h1>
+      <h1>{if ($lang eq 'en') then "About" else "Über"} {if (doc:title) then doc:title else
+        if ($lang eq 'en') then "this Application" else "diese Applikation"}</h1>
       <xsl:apply-templates select="doc:desc" mode="html" />
     </div>
   </xsl:template>
@@ -92,10 +92,10 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
   <xsl:template match="doc:doc[@scope='stylesheet']" mode="html">
     <div class="docBlock stylesheetLevel" id="{escape-html-uri(@id)}">
       <div class="heading-container">
-        <h2>{if ($lang eq 'ger') then "Über" else "About"} {if (doc:title) then
+        <h2>{if ($lang eq 'en') then "About" else "Über"} {if (doc:title) then
           doc:title else doc:includedFrom/@href}</h2>
         <xsl:if test="doc:includedFrom/@href ne ''">
-        <p>Included from <a
+        <p class="includedFrom">Included from <a
               href="#stylesheet;{escape-html-uri(doc:includedFrom/@href)}">
             {doc:includedFrom/@href}</a></p>
         </xsl:if>
@@ -122,7 +122,7 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
       <div class="heading-container">
         <h3>{doc:dispLabel}</h3>
         <xsl:if test="doc:includedFrom/@href ne ''">
-          <p>Included from <a
+          <p class="includedFrom">Included from <a
               href="#stylesheet;{escape-html-uri(doc:includedFrom/@href)}">
             {doc:includedFrom/@href}</a></p>
         </xsl:if>
@@ -158,7 +158,7 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
     </xsl:variable>
     <xsl:if test="$refs">
       <xsl:choose>
-        <xsl:when test="$lang eq 'eng'">
+        <xsl:when test="$lang eq 'en'">
           <h4>References</h4>
         </xsl:when>
         <xsl:otherwise>
@@ -173,13 +173,13 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
   <xsl:template name="renderMode">
     <xsl:apply-templates mode="html" />
     <xsl:if test="doc:attribute[not(@name='name')]">
-      <h4>{if ($lang eq 'eng') then 'Attributes' else 'Attribute'}</h4>
+      <h4>{if ($lang eq 'en') then 'Attributes' else 'Attribute'}</h4>
       <table>
         <thead>
           <tr>
-            <th>{if ($lang eq 'eng') then 'Attribute' else 'Attribut'}</th>
-            <th>{if ($lang eq 'eng') then 'Value' else 'Wert'}</th>
-            <th>{if ($lang eq 'eng') then 'Note' else 'Anmerkung'}</th>
+            <th scope="col">{if ($lang eq 'en') then 'Attribute' else 'Attribut'}</th>
+            <th scope="col">{if ($lang eq 'en') then 'Value' else 'Wert'}</th>
+            <th scope="col">{if ($lang eq 'en') then 'Note' else 'Anmerkung'}</th>
           </tr>
         </thead>
         <xsl:for-each select="doc:attribute[not(@name='name')]">
@@ -207,27 +207,27 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
 
   <!-- Render `doc:context` elements as HTML. -->
   <xsl:template match="doc:context" mode="html">
-    <p><b>{if ($lang eq 'eng') then "Context" else "Kontext"}: </b> <code>{.}</code></p>
+    <p><b>{if ($lang eq 'en') then "Context" else "Kontext"}: </b> <code>{.}</code></p>
   </xsl:template>
 
   <!-- Render the parameter list as table. -->
   <xsl:template name="renderParams">
-    <h4>{if ($lang eq 'ger') then "Parameter" else "Parameters"}</h4>
+    <h4>{if ($lang eq 'en') then "Parameters" else "Parameter"}</h4>
     <table>
       <thead>
         <tr>
           <xsl:choose>
-            <xsl:when test="$lang eq 'eng'">
-              <th>Name</th>
-              <th>Sequence type</th>
-              <th>required</th>
-              <th>Comment</th>
+            <xsl:when test="$lang eq 'en'">
+              <th scope="col">Name</th>
+              <th scope="col">Sequence type</th>
+              <th scope="col">required</th>
+              <th scope="col">Comment</th>
             </xsl:when>
             <xsl:otherwise>
-              <th>Name</th>
-              <th>Sequenztyp</th>
-              <th>verpflichtend</th>
-              <th>Kommentar</th>
+              <th scope="col">Name</th>
+              <th scope="col">Sequenztyp</th>
+              <th scope="col">verpflichtend</th>
+              <th scope="col">Kommentar</th>
             </xsl:otherwise>
           </xsl:choose>
         </tr>
@@ -245,18 +245,18 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
 
   <!-- Render the return vaue as table. -->
   <xsl:template name="renderReturn">
-    <h4>{if ($lang eq 'eng') then 'Return Value' else 'Rückgabewert'}</h4>
+    <h4>{if ($lang eq 'en') then 'Return Value' else 'Rückgabewert'}</h4>
     <table class="table">
       <thead>
         <tr>
           <xsl:choose>
-            <xsl:when test="$lang eq 'eng'">
-              <td>Sequence type</td>
-              <td>Comment</td>
+            <xsl:when test="$lang eq 'en'">
+              <th>Sequence type</th>
+              <th>Comment</th>
             </xsl:when>
             <xsl:otherwise>
-              <td>Sequenztyp</td>
-              <td>Kommentar</td>
+              <th>Sequenztyp</th>
+              <th>Kommentar</th>
             </xsl:otherwise>
           </xsl:choose>
         </tr>
@@ -282,13 +282,13 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
       <thead>
         <tr>
           <xsl:choose>
-            <xsl:when test="$lang eq 'eng'">
-              <td>Reference</td>
-              <td>Comment</td>
+            <xsl:when test="$lang eq 'en'">
+              <th>Reference</th>
+              <th>Comment</th>
             </xsl:when>
             <xsl:otherwise>
-              <td>Referenz</td>
-              <td>Anmerkung</td>
+              <th>Referenz</th>
+              <th>Anmerkung</th>
             </xsl:otherwise>
           </xsl:choose>        </tr>
       </thead>
@@ -316,13 +316,13 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
         <thead>
           <tr>
             <xsl:choose>
-              <xsl:when test="$lang eq 'eng'">
-                <td>Referenced by</td>
-              <td>Comment</td>
+              <xsl:when test="$lang eq 'en'">
+                <th>Referenced by</th>
+              <th>Comment</th>
               </xsl:when>
               <xsl:otherwise>
-                <td>Referenz</td>
-              <td>Anmerkung</td>
+                <th>Referenz</th>
+              <th>Anmerkung</th>
               </xsl:otherwise>
             </xsl:choose>
           </tr>
@@ -351,7 +351,7 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
   <!-- Create a table of contents for the HTML result -->
   <xsl:template name="createToc">
     <div id="toc">
-      <h1>{if ($lang eq 'eng') then 'Table of Contents' else 'Inhaltsverzeichnis'}</h1>
+      <h1>{if ($lang eq 'en') then 'Table of Contents' else 'Inhaltsverzeichnis'}</h1>
       <xsl:if test="doc:doc[@scope='global']">
         <xsl:variable name="globalDocs" select="doc:doc[@scope='global']" />
           <xsl:for-each select="$globalDocs">
@@ -359,7 +359,7 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
             <a href="#{escape-html-uri(@id)}">{
               if (doc:title) then doc:title
               else
-              if ($lang eq 'eng') then 'General Information' else 'Allgemeines'
+              if ($lang eq 'en') then 'General Information' else 'Allgemeines'
               }</a>
           </li>
         </xsl:for-each>
@@ -424,7 +424,7 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
         </xsl:when>
         <xsl:otherwise>
           <title>{
-            if ($lang eq 'eng')
+            if ($lang eq 'en')
             then 'Documentation for unnamed project'
             else 'Dokumentation für unbenanntes Projekt'
           }</title>
@@ -437,7 +437,7 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
         <li><strong>{$title}</strong></li>
       </ul>
       <ul>
-        <li><a href="#toc">{if ($lang eq 'eng') then 'Table of Contents' else 'Inhaltsverzeichnis'}</a></li>
+        <li><a href="#toc">{if ($lang eq 'en') then 'Table of Contents' else 'Inhaltsverzeichnis'}</a></li>
       </ul>
     </nav>
   </xsl:template>
@@ -453,7 +453,7 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
     <xsl:param name="config" required="yes" />
     <xsl:param name="docDir" required="yes" />
     <xsl:param name="readme" />
-        <html>
+        <html lang="{if ($lang) then $lang else 'de'}">
           <head>
             <xsl:sequence select="$htmlHeadCommon" />
           </head>
@@ -466,7 +466,7 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
               </ul>
               <ul>
                 <li>
-                  <a href="#toc">{if ($lang eq 'eng') then 'Table of Contents' else
+                  <a href="#toc">{if ($lang eq 'en') then 'Table of Contents' else
                   'Inhaltsverzeichnis'}</a>
                 </li>
               </ul>
@@ -477,7 +477,7 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
               <xsl:if test="$readme">
                 <li><a href="#readme">Readme</a></li>
               </xsl:if>
-              <li>{if ($lang eq 'eng') then 'Documented Transformations' else 'Dokumentierte Transformationen'}</li>
+              <li>{if ($lang eq 'en') then 'Documented Transformations' else 'Dokumentierte Transformationen'}</li>
               <ul>
                 <xsl:for-each select="$config/config:normalization">
                   <li>
