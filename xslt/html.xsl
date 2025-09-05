@@ -45,6 +45,11 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
 
   <xsl:variable name="htmlFooter">
     <footer>
+      <small>
+        <a href="https://www.obvsg.at/impressum">{if ($lang eq 'en') then 'Imprint' else 'Impressum'}</a> •
+        <a href="https://www.obvsg.at/datenschutz">{if ($lang eq 'en') then 'Privacy' else 'Datenschutz'}</a> •
+        <a href="https://www.obvsg.at/barrierefreiheit">{if ($lang eq 'en') then 'Accessibility' else 'Barrierefreiheit'}</a>
+      </small>
     </footer>
   </xsl:variable>
 
@@ -56,6 +61,7 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
         <xsl:call-template name="navbar" />
         <xsl:call-template name="createToc" />
         <xsl:apply-templates mode="html" />
+        <xsl:sequence select="$htmlFooter" />
         <xsl:sequence select="$htmlBodyScripts" />
       </body>
     </html>
@@ -512,6 +518,7 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
                 </md-block>
               </div>
             </xsl:if>
+            <xsl:sequence select="$htmlFooter" />
             <xsl:sequence select="$htmlBodyScripts" />
           </body>
         </html>
