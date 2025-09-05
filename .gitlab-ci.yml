@@ -17,7 +17,7 @@ deploy_development:
   stage: deploy
   environment:
     name: development
-    url: http://share-test.obvsg.at/docs/xsltDocGenerator
+    url: http://share-test.obvsg.at/xsldocs/xslt-documentation-generator
   before_script:
     ##
     ## Install ssh-agent if not already installed, it is required by Docker.
@@ -45,7 +45,7 @@ deploy_development:
     - chmod 644 ~/.ssh/known_hosts
 
   script:
-    - rsync -r -p docs/* obvsoft@galileo:/work/obvsoft/evol/apps/work_area/ss/docs/xslt-documentation-generator
+    - rsync -r -p docs/* obvsoft@galileo:/work/obvsoft/evol/apps/work_area/ss/xsldocs/xslt-documentation-generator
   only:
     - development
 
