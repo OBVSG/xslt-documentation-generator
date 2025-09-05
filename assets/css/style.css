@@ -1,0 +1,55 @@
+:root {
+    --pico-border-radius: 1rem;
+    --pico-typography-spacing-vertical: 1.5rem;
+}
+
+body {
+    margin-top: 100px;
+    margin-bottom: 100px;
+    margin-right: 150px;
+    margin-left: 80px;
+    width: 80%;
+}
+
+nav {
+    z-index: 10000;
+    position: fixed;
+    top: 0px;
+    width: 90%;
+    background-color: var(--pico-background-color);
+    border-bottom: 2px solid var(--pico-primary);
+}
+
+p {
+    margin-bottom: 0.6rem;
+}
+
+div {
+    scroll-margin-top: 75px;
+}
+
+.heading-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.includedFrom {
+    font-size: smaller;
+    text-align: right;
+}
+.docBlock {
+    margin-top: 50px;
+}
+.docBlock.globalLevel {
+    margin-bottom: 50px;
+}
+.docBlock.stylesheetLevel {
+    border-top: 5px solid var(--pico-primary);
+}
+.docBlock.elementLevel {
+    border-top: 2px solid var(--pico-primary);
+}
+.docBlock > :not(:first-child){
+    margin-left: 30px;
+}

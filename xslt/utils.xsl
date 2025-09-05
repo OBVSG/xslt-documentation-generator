@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:utils="http://www.obvsg.at/xslt/utils" xmlns:fn="http://www.w3.org/2005/xpath-functions" xmlns:doc="http://www.obvsg.at/ns/doc" expand-text="yes" version="3.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:utils="https://share.obvsg.at/xml/xsl/utils" xmlns:fn="http://www.w3.org/2005/xpath-functions" xmlns:doc="https://share.obvsg.at/xml/xsl/doc" expand-text="yes" version="3.0">
   <doc:doc scope="stylesheet">
     <doc:desc>This file contains utility functions. It has to be the first `xsl:include` in `documentation-generator.xsl`.</doc:desc>
   </doc:doc>
@@ -20,6 +20,10 @@
       <xsl:when test="local-name() eq 'template' and @name">temp;{@name}</xsl:when>
       <xsl:when test="local-name() eq 'template' and @match">temp;{@match};{if (@mode) then @mode else "nil"}</xsl:when>
       <xsl:when test="local-name() eq 'function'">func;{@name}</xsl:when>
+      <xsl:when test="local-name() eq 'mode'">mode;{if (@name) then @name else 'unnamed'}</xsl:when>
+      <xsl:otherwise>
+          <xsl:message>{utils:format-message("error", ., "Unable to create id!")}</xsl:message>
+        </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
@@ -42,6 +46,9 @@
   </xsl:function>
 
 
+  <!--
+      Format messages for console output with `xsl:message`.
+  -->
   <xsl:function name="utils:format-message">
     <xsl:param name="severity" as="xs:string" />
     <xsl:param name="context" />

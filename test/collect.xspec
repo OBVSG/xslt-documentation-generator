@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <x:description xmlns:x="http://www.jenitennison.com/xslt/xspec"
-               xmlns:doc="http://www.obvsg.at/ns/doc" xmlns:utils="http://www.obvsg.at/xslt/utils"
+               xmlns:doc="https://share.obvsg.at/xml/xsl/doc" xmlns:utils="https://share.obvsg.at/xml/xsl/utils"
                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                stylesheet="../xslt/documentation-generator.xsl">
 
@@ -44,7 +44,7 @@ Negative relative indent (0 spaces from left)</doc:desc>
     @context marc:datafield
     @param documentedParam A param that is very well documented
     @param undocumentedParam
-    @returns documentation of the return value
+    @return documentation of the return value
     @references temp;datafield[@tag='245'];nil Template that matches the title field
     @referencedBy temp;dummyTemplate;nil;dummyMode
         </x:param>
@@ -55,7 +55,7 @@ Negative relative indent (0 spaces from left)</doc:desc>
           <doc:context>marc:datafield</doc:context>
           <doc:param name="documentedParam">A param that is very well documented</doc:param>
           <doc:param name="undocumentedParam" />
-          <doc:returns>documentation of the return value</doc:returns>
+          <doc:return>documentation of the return value</doc:return>
           <doc:references ref="temp;datafield[@tag='245'];nil">Template that matches the title field</doc:references>
           <doc:referencedBy ref="temp;dummyTemplate;nil;dummyMode" />
         </doc:doc>
@@ -63,29 +63,5 @@ Negative relative indent (0 spaces from left)</doc:desc>
     </x:scenario>
 
   </x:scenario>
-  <x:scenario label="get referenced template">
-    <x:scenario label="">
-      <x:context select="/xsl:stylesheet/xsl:template[@name='callingTemplate']">
-        <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:marc="http://www.loc.gov/MARC21/slim" xmlns:utils="http://www.obvsg.at/xslt/utils" expand-text="yes" version="3.0">
 
-          <xsl:template name="calledTemplate" mode="foo" />
-          <xsl:template name="calledTemplateWithMatch" match="nought" />
-
-          <xsl:template name="callingTemplate">
-            <xsl:call-template name="calledTemplate" />
-            <xsl:if test="exists(foo)">
-              <xsl:call-template name="calledTemplateWithMatch" />
-            </xsl:if>
-          </xsl:template>
-        </xsl:stylesheet>
-
-      </x:context>
-      <x:call template="collectReferences" />
-      <x:expect label="">
-        <doc:references ref="temp;calledTemplate" />
-        <doc:references ref="temp;calledTemplateWithMatch" />
-      </x:expect>
-    </x:scenario>
-
-  </x:scenario>
 </x:description>

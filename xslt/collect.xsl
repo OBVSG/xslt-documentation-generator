@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:utils="http://www.obvsg.at/xslt/utils" xmlns:fn="http://www.w3.org/2005/xpath-functions" xmlns:doc="http://www.obvsg.at/ns/doc" expand-text="yes" version="3.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:utils="https://share.obvsg.at/xml/xsl/utils" xmlns:fn="http://www.w3.org/2005/xpath-functions" xmlns:doc="https://share.obvsg.at/xml/xsl/doc" expand-text="yes" version="3.0">
 
   <doc:doc scope="stylesheet">
     <doc:title>collect.xsl</doc:title>
@@ -10,6 +10,11 @@ This is because not all elements of a project are available simultaneously at th
 functions declared in another file would not be found.</doc:desc>
   </doc:doc>
 
+  <!--
+      Mode to collect documentation about various XSLT-elements.
+
+      @attribute on-no-match If there's no match, do nothing and continue matching for children.
+  -->
   <xsl:mode name="collect" on-no-match="shallow-skip" />
 
   <!-- Documentation at the global or stylesheet level -->
@@ -40,7 +45,7 @@ functions declared in another file would not be found.</doc:desc>
       @param includedFrom Path to the stylesheet that included this one with `xsl:include`
       @references temp;createId Create ID for this documentation element
   -->
-  <xsl:template match="xsl:template|xsl:function" mode="collect">
+  <xsl:template match="xsl:template|xsl:function|xsl:mode" mode="collect">
     <xsl:param name="includedFrom" as="xs:string" />
     <xsl:variable name="id">
       <xsl:call-template name="createId" />
@@ -86,6 +91,17 @@ functions declared in another file would not be found.</doc:desc>
         <xsl:with-param name="refFromDoc" select="$docForElement/doc:doc/doc:references" />
       </xsl:call-template>
       <xsl:sequence select="$docForElement/doc:doc/doc:referencedBy" />
+      <xsl:if test="local-name() eq 'mode'">
+        <xsl:for-each select="./attribute()">
+          <xsl:variable name="attName" select="name()" />
+          <xsl:variable
+            name="attFromDoc"
+            select="$docForElement/doc:doc/doc:attribute[@name=$attName]" />
+          <doc:attribute name="{name()}" value="{data()}">
+            <xsl:if test="$attFromDoc">{$attFromDoc}</xsl:if>
+          </doc:attribute>
+        </xsl:for-each>
+      </xsl:if>
       <doc:src>
         <xsl:sequence select="." />
       </doc:src>
@@ -184,7 +200,7 @@ functions declared in another file would not be found.</doc:desc>
     If the return type of the documentation doesn't match @as of the function, throw an error message and terminate.
     If the return type is documented, but not declared in the function declaration, throw a warning. In this case, the return type from the documentation is used.
 
-    @param returnFromDoc `doc:return-element` from `doc:doc` corresponding to the function to document
+    @param returnFromDoc `doc:return`-element from `doc:doc` corresponding to the function to document
   -->
   <xsl:template name="docReturn">
     <xsl:param name="returnFromDoc" as="element(doc:return)?" />
@@ -216,14 +232,16 @@ functions declared in another file would not be found.</doc:desc>
         <xsl:when test="local-name() = 'template' and @name">Named template</xsl:when>
         <xsl:when test="local-name() = 'template'">Template</xsl:when>
         <xsl:when test="local-name() = 'function'">Function</xsl:when>
+        <xsl:when test="local-name() eq 'mode'">Mode</xsl:when>
         <xsl:otherwise>{local-name()}</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
     <doc:dispLabel>{
       $what
-      || (if (@name) then ' "' || @name || '"' else "")
+      || (if (@name) then ' "' || @name || '"'
+         else
+           if ($what eq 'Mode') then ' unnamed' else "")
       || (if (@match) then ', matching "' || @match || '"' else '')
-      || (if (@mode) then ', mode="' || @mode || '"' else '')
     }</doc:dispLabel>
   </xsl:template>
 
@@ -247,8 +265,8 @@ functions declared in another file would not be found.</doc:desc>
           <xsl:when test="starts-with(., 'param')">
             <doc:param name="{tokenize(.)[2]}">{replace(., "^param \S+", "") => normalize-space()}</doc:param>
           </xsl:when>
-          <xsl:when test="starts-with(., 'returns')">
-            <doc:returns>{replace(., "^returns ", "") => normalize-space()}</doc:returns>
+          <xsl:when test="starts-with(., 'return')">
+            <doc:return>{replace(., "^return ", "") => normalize-space()}</doc:return>
           </xsl:when>
           <xsl:when test="starts-with(., 'references') or starts-with(., 'referencedBy')">
             <xsl:variable name="name" select="tokenize(.)[1]" />
@@ -258,6 +276,13 @@ functions declared in another file would not be found.</doc:desc>
               <xsl:text>{replace(., "^" || $name || " \S+", "") => normalize-space()}</xsl:text>
             </xsl:element>
           </xsl:when>
+          <xsl:when test="starts-with(., 'attribute')">
+            <xsl:variable name="name" select="tokenize(.)[2]" />
+            <doc:attribute name="{$name}">{replace(., "^attribute\s+" || $name, "") => normalize-space()}</doc:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:message>When parsing doc-comment: Encountered unknown property "@{.}". Ignoring.</xsl:message>
+          </xsl:otherwise>
         </xsl:choose>
       </xsl:iterate>
     </doc:doc>
@@ -267,9 +292,14 @@ functions declared in another file would not be found.</doc:desc>
       Include Markdown from file.
   -->
   <xsl:template match="doc:includeMd" mode="collect">
-    <xsl:if test="unparsed-text-available(@href)">
-      <xsl:sequence select="unparsed-text(@href)" />
-    </xsl:if>
+    <xsl:variable name="pwd" select="base-uri() =&gt; replace('[^/]+$', '')" />
+    <xsl:variable name="inclAbsPath" select="if (starts-with(@href, 'http:')) then @href else $pwd || @href" />
+    <xsl:choose>
+      <xsl:when test="unparsed-text-available($inclAbsPath)">
+        <xsl:sequence select="unparsed-text($inclAbsPath)" />
+      </xsl:when>
+      <xsl:otherwise>**FILE NOT FOUND: {$inclAbsPath}**</xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <!--

@@ -1,4 +1,4 @@
-namespace doc = "http://www.obvsg.at/ns/doc"
+namespace doc = "https://share.obvsg.at/xml/xsl/doc"
 
 start = Doc
 Doc = element doc:Doc { doc* }
@@ -20,7 +20,7 @@ doc = element doc:doc {
         attribute as { text }?,
         attribute required { "yes" | "no" }?,
         text }*,
-    element doc:returns {
+    element doc:return {
         attribute as { text }?,
         text}?,
     element doc:references {

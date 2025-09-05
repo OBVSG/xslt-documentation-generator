@@ -32,14 +32,14 @@ So the following comment:
 <!-- 
     Create foo out of bar
     
-    @parem baz The baz to be fnorded
+    @param baz The baz to be fnorded
 -->
 ```
 
 Is read as
 
 ``` xml
-<doc:doc xmlns:doc="http://www.obvsg.at/ns/doc">
+<doc:doc xmlns:doc="https://share.obvsg.at/xml/xsl/doc">
   <doc:desc>Create foo out of bar</doc:desc>
   <doc:param name="baz">The baz to be fnorded</doc:param>
 </doc:doc>
@@ -47,7 +47,7 @@ Is read as
 
 
 # Usage
-This stlysheet is intended to be used with Saxon from the command line. There are two ways to run it: Supplying a stylesheet to document and supplying a configuration file.
+This stylesheet is intended to be used with Saxon from the command line. There are two ways to run it: Supplying a stylesheet to document and supplying a configuration file.
 
 ## Parameters
 There are two parameters that can (or must) be passed to the transformation:

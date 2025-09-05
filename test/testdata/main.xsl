@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:doc="http://www.obvsg.at/ns/doc" version="3.0" expand-text="yes" exclude-result-prefixes="#all">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:doc="https://share.obvsg.at/xml/xsl/doc" version="3.0" expand-text="yes" exclude-result-prefixes="#all">
   <doc:doc scope="stylesheet">
     <doc:title>doc:title-element</doc:title>
     <doc:desc>Dies ist ein Teststylesheet</doc:desc>
@@ -33,7 +33,7 @@
   </xsl:template>
 
   <doc:doc>
-    <doc:return>Dokumentation eines Funktions-Rückgabewerts</doc:return>
+    <doc:return>Dokumentation eines Funktions-Rückgabewerts</doc:returns>
   </doc:doc>
   <xsl:function name="dummyFunction" as="xs:string">
     <xsl:value-of select="'hallo'" />
