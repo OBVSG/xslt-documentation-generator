@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:utils="https://share.obvsg.at/xml/xsl/utils" xmlns:fn="http://www.w3.org/2005/xpath-functions" xmlns:doc="https://share.obvsg.at/xml/xsl/doc" expand-text="yes" version="3.0">
 
-  <doc:doc scope="stylesheet">
-    <doc:title>collect.xsl</doc:title>
-    <doc:desc>This stylesheet holds templates and functions needed to populate a `doc:Doc`-document from an XSLT-Stlyesheet.
+  <!--~doc:stylesheet
+      This stylesheet holds templates and functions needed to populate a `doc:Doc`-document from an XSLT-Stlyesheet.
 
-This document is intended for further processing into other formats like HTML. Backreferences are handled in [html.xsl](#stylesheet;html.xsl).
-This is because not all elements of a project are available simultaneously at this stage and references to templates or
-functions declared in another file would not be found.</doc:desc>
-  </doc:doc>
+      This document is intended for further processing into other formats like HTML. Backreferences are handled in [html.xsl](#stylesheet;html.xsl).
+      This is because not all elements of a project are available simultaneously at this stage and references to templates or functions declared in another file would not be found.
+
+      @title collect.xsl
+  -->
 
   <!--
       Mode to collect documentation about various XSLT-elements.
@@ -33,6 +33,23 @@ functions declared in another file would not be found.</doc:desc>
         </xsl:if>
       <xsl:sequence select="*[not(doc:includeMd)]" />
       </doc:doc>
+  </xsl:template>
+
+  <!--
+      Documentation from global or stylesheet level doc-comments.
+
+      Comments must start with `~doc:global` or `~doc:stylesheet` to count as such.
+  -->
+  <xsl:template match="comment()[starts-with(., '~doc:stylesheet') or starts-with(., '~doc:global')]" mode="collect">
+    <xsl:variable name="includedFrom" select="replace(base-uri(), '^.*/', '')" />
+    <xsl:variable name="docFromComment">
+      <xsl:sequence select="utils:docFromString(.)" />
+    </xsl:variable>
+    <doc:doc scope="{$docFromComment/doc:doc/@scope}"
+             id="{$docFromComment/doc:doc/@scope};{$includedFrom}">
+      <xsl:sequence select="$docFromComment/doc:doc/*" />
+      <doc:includedFrom href="{$includedFrom}" />
+    </doc:doc>
   </xsl:template>
 
   <!--
@@ -248,9 +265,16 @@ functions declared in another file would not be found.</doc:desc>
   <!-- Create `doc:doc` element from docstring -->
   <xsl:function name="utils:docFromString" as="element(doc:doc)">
     <xsl:param name="inString" as="xs:string" />
+    <xsl:variable name="scope">
+      <xsl:choose>
+        <xsl:when test="starts-with(normalize-space($inString), '~doc:global')">global</xsl:when>
+        <xsl:when test="starts-with(normalize-space($inString), '~doc:stylesheet')">stylesheet</xsl:when>
+        <xsl:otherwise>element</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:variable name="parts"
-                  select="tokenize($inString, '^\s*@', 'm')" />
-    <doc:doc>
+                  select="$inString => replace('^\s*~doc:\w+', '') => tokenize('^\s*@', 'm')" />
+    <doc:doc scope="{$scope}">
       <doc:desc>{
         $parts[1]
           => replace("^[\s\n]+\n", "")
@@ -279,6 +303,12 @@ functions declared in another file would not be found.</doc:desc>
           <xsl:when test="starts-with(., 'attribute')">
             <xsl:variable name="name" select="tokenize(.)[2]" />
             <doc:attribute name="{$name}">{replace(., "^attribute\s+" || $name, "") => normalize-space()}</doc:attribute>
+          </xsl:when>
+          <xsl:when test="starts-with(., 'includeMd')">
+            <doc:includeMd href="{replace(., '^includeMd\s+', '') => normalize-space()}" />
+          </xsl:when>
+          <xsl:when test="starts-with(., 'title')">
+            <doc:title>{replace(., '^title\s+', '') => normalize-space()}</doc:title>
           </xsl:when>
           <xsl:otherwise>
             <xsl:message>When parsing doc-comment: Encountered unknown property "@{.}". Ignoring.</xsl:message>

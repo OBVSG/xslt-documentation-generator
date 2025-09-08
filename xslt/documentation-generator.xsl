@@ -106,7 +106,7 @@ saxon-xslt -xsl:xslt-documentation-generator/xslt/documentation-generator.xsl -i
           <xsl:with-param name="includedFrom" select="$includedFrom" />
         </xsl:apply-templates>
         <xsl:for-each select="$modulePaths">
-          <xsl:apply-templates select="doc(.('absPath'))/xsl:stylesheet/child::*" mode="collect">
+          <xsl:apply-templates select="doc(.('absPath'))/xsl:stylesheet" mode="collect">
             <xsl:with-param name="includedFrom" select=".('relPath')" />
           </xsl:apply-templates>
         </xsl:for-each>

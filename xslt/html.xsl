@@ -30,7 +30,6 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
   <!-- HTML-header data for all result documents -->
   <xsl:variable name="htmlHeadCommon">
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.pumpkin.min.css" />
-    <!--Highlight.js: https://highlightjs.org/usage/-->
       <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.3.1/styles/dark.min.css" />
       <xsl:if test="unparsed-text-available('../assets/css/style.css')">
         <style>{unparsed-text('../assets/css/style.css')}</style>

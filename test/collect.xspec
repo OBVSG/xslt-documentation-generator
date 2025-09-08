@@ -22,7 +22,7 @@ Negative relative indent (0 spaces from left)
         </x:param>
       </x:call>
       <x:expect label="doc:doc with doc:desc">
-        <doc:doc>
+        <doc:doc scope="element">
           <doc:desc>Beginning of text. Indented four spaces
   - two more spaces
     - four more spaces
@@ -50,7 +50,7 @@ Negative relative indent (0 spaces from left)</doc:desc>
         </x:param>
       </x:call>
       <x:expect label="doc:doc with doc:desc">
-        <doc:doc>
+        <doc:doc scope="element">
           <doc:desc>Description</doc:desc>
           <doc:context>marc:datafield</doc:context>
           <doc:param name="documentedParam">A param that is very well documented</doc:param>
@@ -61,7 +61,37 @@ Negative relative indent (0 spaces from left)</doc:desc>
         </doc:doc>
       </x:expect>
     </x:scenario>
+    <x:scenario label="global doc">
 
+      <x:call function="utils:docFromString">
+        <x:param name="inString">~doc:global
+  Global description
+
+  @includeMd README.md
+        </x:param>
+      </x:call>
+      <x:expect label="doc:doc[@scope='global'] with doc:desc and doc:includeMd">
+        <doc:doc scope="global">
+          <doc:desc>Global description</doc:desc>
+          <doc:includeMd href="README.md" />
+        </doc:doc>
+      </x:expect>
+    </x:scenario>
+    <x:scenario label="global doc">
+      <x:call function="utils:docFromString">
+        <x:param name="inString">~doc:stylesheet
+  Stylesheet description
+
+  @title stylesheet.xsl
+        </x:param>
+      </x:call>
+      <x:expect label="doc:doc[@scope='global'] with doc:desc and doc:title">
+        <doc:doc scope="stylesheet">
+          <doc:desc>Stylesheet description</doc:desc>
+          <doc:title>stylesheet.xsl</doc:title>
+        </doc:doc>
+      </x:expect>
+    </x:scenario>
   </x:scenario>
 
 </x:description>
