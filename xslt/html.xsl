@@ -363,28 +363,30 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
   <xsl:template name="createToc">
     <div id="toc">
       <h1>{if ($lang eq 'en') then 'Table of Contents' else 'Inhaltsverzeichnis'}</h1>
-      <xsl:if test="doc:doc[@scope='global']">
-        <xsl:variable name="globalDocs" select="doc:doc[@scope='global']" />
-          <xsl:for-each select="$globalDocs">
-          <li>
-            <a href="#{escape-html-uri(@id)}">{
-              if (doc:title) then doc:title
-              else
-              if ($lang eq 'en') then 'General Information' else 'Allgemeines'
+      <ul>
+        <xsl:if test="doc:doc[@scope='global']">
+          <xsl:variable name="globalDocs" select="doc:doc[@scope='global']" />
+          <xsl:for-each
+            select="$globalDocs">
+            <li>
+              <a href="#{escape-html-uri(@id)}">{
+                if (doc:title) then doc:title
+                else
+                if ($lang eq 'en') then 'General Information' else 'Allgemeines'
               }</a>
-          </li>
-        </xsl:for-each>
-      </xsl:if>
-      <xsl:for-each-group select="doc:doc" group-by="doc:includedFrom/@href">
-        <xsl:variable name="stylesheetDoc" select="current-group()[@scope='stylesheet']" />
-        <xsl:variable name="elementDoc" select="current-group()[@scope='element' or not(@scope)]" />
-        <ul>
+            </li>
+          </xsl:for-each>
+        </xsl:if>
+        <xsl:for-each-group select="doc:doc" group-by="doc:includedFrom/@href">
+          <xsl:variable name="stylesheetDoc" select="current-group()[@scope='stylesheet']" />
+        <xsl:variable name="elementDoc"
+                      select="current-group()[@scope='element' or not(@scope)]" />
           <li>
-            <a href="#{escape-html-uri($stylesheetDoc/@id)}">{if
-        ($stylesheetDoc/doc:title)
-              then $stylesheetDoc/doc:title else
-        $stylesheetDoc/doc:includedFrom/@href
-              }</a>
+            <a href="#{escape-html-uri($stylesheetDoc/@id)}">{
+            if ($stylesheetDoc/doc:title)
+            then $stylesheetDoc/doc:title
+            else $stylesheetDoc/doc:includedFrom/@href
+            }</a>
           </li>
           <ul>
             <xsl:for-each select="$elementDoc">
@@ -393,16 +395,16 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
               </li>
             </xsl:for-each>
           </ul>
-        </ul>
-      </xsl:for-each-group>
+        </xsl:for-each-group>
+      </ul>
     </div>
   </xsl:template>
 
   <!--
       Render source code.
 
-      Source code is rendered into an accordion, collapsed by default. Syntax highlighting is done by `higlight.js`. See [the `head` of the HTML](#temp;createHtmlHead)
-      for inclusion of `highlight.js`.
+      Source code is rendered into an accordion, collapsed by default. Syntax highlighting is done by `Prism`. See [the `head` of the HTML](#temp;createHtmlHead)
+      for inclusion of `Prism`.
   -->
   <xsl:template name="renderSource">
     <details>
