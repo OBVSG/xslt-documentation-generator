@@ -500,7 +500,7 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
               </xsl:if>
               <li>{if ($lang eq 'en') then 'Documented Transformations' else 'Dokumentierte Transformationen'}</li>
               <ul>
-                <xsl:for-each select="$config/config:normalization">
+                <xsl:for-each select="$config/config:transformation">
                   <li>
                     <a href="{@distName}/index.html">{@name}</a>
                   </li>
