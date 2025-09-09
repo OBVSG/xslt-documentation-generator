@@ -72,7 +72,7 @@ saxon-xslt -xsl:xslt-documentation-generator/xslt/documentation-generator.xsl -i
       => replace("[^/]+$", "")
     }</xsl:variable>
     <xsl:variable name="docDir"
-                  select="if ($projConfig/docDir) then $projectRoot || $projConfig/docDir else $projectRoot || 'docs/'" />
+                  select="if ($projConfig/config:docDir) then $projectRoot || $projConfig/config:docDir || '/' else $projectRoot || 'docs/'" />
     <!-- Make index file -->
     <xsl:result-document href="{$docDir}/index.html"
                          method="html"
