@@ -474,55 +474,64 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
     <xsl:param name="config" required="yes" />
     <xsl:param name="docDir" required="yes" />
     <xsl:param name="readme" />
-        <html lang="{if ($lang) then $lang else 'de'}">
-          <head>
-            <xsl:sequence select="$htmlHeadCommon" />
-          </head>
-          <body>
-            <nav>
-              <ul>
-                <li>
-                  <strong>{$title}</strong>
-                </li>
-              </ul>
-              <ul>
-                <li>
-                  <a href="#toc">{if ($lang eq 'en') then 'Table of Contents' else
-                  'Inhaltsverzeichnis'}</a>
-                </li>
-              </ul>
-            </nav>
+    <html lang="{if ($lang) then $lang else 'de'}">
+      <head>
+        <xsl:sequence select="$htmlHeadCommon" />
+      </head>
+      <body>
+        <nav>
+          <ul>
+            <li>
+              <strong>{$title}</strong>
+            </li>
+          </ul>
+          <ul>
+            <li>
+              <a href="#toc">{if ($lang eq 'en') then 'Table of Contents' else
+              'Inhaltsverzeichnis'}</a>
+            </li>
+            <li>
+              <label for="theme-switch">
+                <input type="checkbox"
+                       onclick="document.documentElement.setAttribute('data-theme', document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light')"
+                       id="theme-switch"
+                       name="dm-switch"
+                       role="switch" />
+              </label>
+            </li>
+          </ul>
+        </nav>
 
-            <h1 id="toc">Inhaltsverzeichnis</h1>
-            <ul>
-              <xsl:if test="$readme">
-                <li><a href="#readme">Readme</a></li>
-              </xsl:if>
-              <li>{if ($lang eq 'en') then 'Documented Transformations' else 'Dokumentierte Transformationen'}</li>
-              <ul>
-                <xsl:for-each select="$config/config:transformation">
-                  <li>
-                    <a href="{@distName}/index.html">{@name}</a>
-                  </li>
-                </xsl:for-each>
-              </ul>
-            </ul>
-            <xsl:if test="$readme">
-              <div id="readme">
-                <md-block>
-                  <xsl:choose>
-                    <xsl:when test="unparsed-text-available($readme)">
-                      <xsl:sequence select="unparsed-text($readme)" />
-                    </xsl:when>
-                    <xsl:otherwise>**FILE NOT FOUND: {$readme}**</xsl:otherwise>
-                  </xsl:choose>
-                </md-block>
-              </div>
-            </xsl:if>
-            <xsl:sequence select="$htmlFooter" />
-            <xsl:sequence select="$htmlBodyScripts" />
-          </body>
-        </html>
+        <h1 id="toc">Inhaltsverzeichnis</h1>
+        <ul>
+          <xsl:if test="$readme">
+            <li><a href="#readme">Readme</a></li>
+          </xsl:if>
+          <li>{if ($lang eq 'en') then 'Documented Transformations' else 'Dokumentierte Transformationen'}</li>
+          <ul>
+            <xsl:for-each select="$config/config:transformation">
+              <li>
+                <a href="{@distName}/index.html">{@name}</a>
+              </li>
+            </xsl:for-each>
+          </ul>
+        </ul>
+        <xsl:if test="$readme">
+          <div id="readme">
+            <md-block>
+              <xsl:choose>
+                <xsl:when test="unparsed-text-available($readme)">
+                  <xsl:sequence select="unparsed-text($readme)" />
+                </xsl:when>
+                <xsl:otherwise>**FILE NOT FOUND: {$readme}**</xsl:otherwise>
+              </xsl:choose>
+            </md-block>
+          </div>
+        </xsl:if>
+        <xsl:sequence select="$htmlFooter" />
+        <xsl:sequence select="$htmlBodyScripts" />
+      </body>
+    </html>
   </xsl:template>
 
 </xsl:stylesheet>
