@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:doc="https://share.obvsg.at/xml/xsl/doc" xmlns:utils="https://share.obvsg.at/xml/xsl/utils" xmlns:config="https://share.obvsg.at/xml/misc/config" exclude-result-prefixes="xsl" expand-text="yes" version="3.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:fn="http://www.w3.org/2005/xpath-functions" xmlns:doc="https://share.obvsg.at/xml/xsl/doc" xmlns:utils="https://share.obvsg.at/xml/xsl/utils" xmlns:config="https://share.obvsg.at/xml/misc/config" exclude-result-prefixes="xsl" expand-text="yes" version="3.0">
 
   <doc:doc scope="global">
     <doc:title>XSLT Documentation Generator</doc:title>
@@ -42,6 +42,8 @@ saxon-xslt -xsl:xslt-documentation-generator/xslt/documentation-generator.xsl -i
 
   <xsl:param name="lang" select="'ger'" as="xs:string" />
   <xsl:param name="configFile" as="xs:string" />
+  <xsl:variable name="globalConfig"
+                select="if (doc-available($configFile)) then doc($configFile) else ()" />
 
   <xsl:preserve-space elements="doc:desc" />
 

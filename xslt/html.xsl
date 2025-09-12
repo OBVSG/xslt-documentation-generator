@@ -45,10 +45,33 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
   <xsl:variable name="htmlFooter">
     <footer>
       <small>
-        <a href="https://www.obvsg.at/impressum">{if ($lang eq 'en') then 'Imprint' else 'Impressum'}</a> •
-        <a href="https://www.obvsg.at/datenschutz">{if ($lang eq 'en') then 'Privacy' else 'Datenschutz'}</a> •
-        <a href="https://www.obvsg.at/barrierefreiheit">{if ($lang eq 'en') then 'Accessibility' else 'Barrierefreiheit'}</a>
+        <p>
+          <a href="https://www.obvsg.at/impressum">{if ($lang eq 'en') then 'Imprint' else 'Impressum'}</a> •
+          <a href="https://www.obvsg.at/datenschutz">{if ($lang eq 'en') then 'Privacy' else 'Datenschutz'}</a> •
+          <a href="https://www.obvsg.at/barrierefreiheit">{if ($lang eq 'en') then 'Accessibility' else 'Barrierefreiheit'}</a>
+        </p>
+        <xsl:if test="$globalConfig/config:config/config:projectInfo/config:contributors">
+          <xsl:variable name="projectInfo" select="$globalConfig/config:config/config:projectInfo" />
+          <p>
+            <a href="{$projectInfo/config:docWebsite/@href}">{if ($lang eq 'en') then 'This documentation for ' else 'Diese Dokumentation für '}{$projectInfo/config:name} </a>
+            © {year-from-date(current-date())}
+            by
+            <xsl:for-each select="$projectInfo/config:contributors/config:contributor">
+              <a href="{if (@profile) then @profile else if (@email) then 'mailto:' || @email else ''}">{
+                (if (position() eq 1) then ''
+                 else if (position() eq last()) then ' and '
+                 else ', '
+                ) || .
+              }</a>
+            </xsl:for-each>
+
+            is licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>
+            <img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" alt="creative commons icon 'cc'" style="max-width: 1em;max-height:1em;margin-left: .2em;" />
+            <img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" alt="creative commons icon 'by'" style="max-width: 1em;max-height:1em;margin-left: .2em;" />
+          </p>
+        </xsl:if>
       </small>
+
     </footer>
   </xsl:variable>
 
