@@ -41,7 +41,7 @@
       Comments must start with `~doc:global` or `~doc:stylesheet` to count as such.
   -->
   <xsl:template match="comment()[starts-with(., '~doc:stylesheet') or starts-with(., '~doc:global')]" mode="collect">
-    <xsl:variable name="includedFrom" select="replace(base-uri(), '^.*/', '')" />
+    <xsl:param name="includedFrom" as="xs:string" />
     <xsl:variable name="docFromComment">
       <xsl:sequence select="utils:docFromString(.)" />
     </xsl:variable>
