@@ -8,7 +8,7 @@ docs:
   stage: docs
   script:
     - mkdir docs
-    - saxon-xslt -s:xslt/documentation-generator.xsl -xsl:xslt/documentation-generator.xsl lang=en > docs/index.html
+    - saxon-xslt -s:xslt/documentation-generator.xsl -xsl:xslt/documentation-generator.xsl lang=en configFile=../config.xml > docs/index.html
   artifacts:
     paths:
       - docs
