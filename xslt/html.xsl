@@ -30,7 +30,6 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
   <!-- HTML-header data for all result documents -->
   <xsl:variable name="htmlHeadCommon">
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.pumpkin.min.css" />
-    <!--Highlight.js: https://highlightjs.org/usage/-->
       <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.3.1/styles/dark.min.css" />
       <xsl:if test="unparsed-text-available('../assets/css/style.css')">
         <style>{unparsed-text('../assets/css/style.css')}</style>
@@ -46,10 +45,33 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
   <xsl:variable name="htmlFooter">
     <footer>
       <small>
-        <a href="https://www.obvsg.at/impressum">{if ($lang eq 'en') then 'Imprint' else 'Impressum'}</a> •
-        <a href="https://www.obvsg.at/datenschutz">{if ($lang eq 'en') then 'Privacy' else 'Datenschutz'}</a> •
-        <a href="https://www.obvsg.at/barrierefreiheit">{if ($lang eq 'en') then 'Accessibility' else 'Barrierefreiheit'}</a>
+        <p>
+          <a href="https://www.obvsg.at/impressum">{if ($lang eq 'en') then 'Imprint' else 'Impressum'}</a> •
+          <a href="https://www.obvsg.at/datenschutz">{if ($lang eq 'en') then 'Privacy' else 'Datenschutz'}</a> •
+          <a href="https://www.obvsg.at/barrierefreiheit">{if ($lang eq 'en') then 'Accessibility' else 'Barrierefreiheit'}</a>
+        </p>
+        <xsl:if test="$globalConfig/config:config/config:projectInfo/config:contributors">
+          <xsl:variable name="projectInfo" select="$globalConfig/config:config/config:projectInfo" />
+          <p>
+            <a href="{$projectInfo/config:docWebsite/@href}">{if ($lang eq 'en') then 'This documentation for ' else 'Diese Dokumentation für '}{$projectInfo/config:name} </a>
+            © {year-from-date(current-date())}
+            by
+            <xsl:for-each select="$projectInfo/config:contributors/config:contributor">
+              <a href="{if (@profile) then @profile else if (@email) then 'mailto:' || @email else ''}">{
+                (if (position() eq 1) then ''
+                 else if (position() eq last()) then ' and '
+                 else ', '
+                ) || .
+              }</a>
+            </xsl:for-each>
+
+            is licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>
+            <img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" alt="creative commons icon 'cc'" style="max-width: 1em;max-height:1em;margin-left: .2em;" />
+            <img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" alt="creative commons icon 'by'" style="max-width: 1em;max-height:1em;margin-left: .2em;" />
+          </p>
+        </xsl:if>
       </small>
+
     </footer>
   </xsl:variable>
 
@@ -363,28 +385,30 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
   <xsl:template name="createToc">
     <div id="toc">
       <h1>{if ($lang eq 'en') then 'Table of Contents' else 'Inhaltsverzeichnis'}</h1>
-      <xsl:if test="doc:doc[@scope='global']">
-        <xsl:variable name="globalDocs" select="doc:doc[@scope='global']" />
-          <xsl:for-each select="$globalDocs">
-          <li>
-            <a href="#{escape-html-uri(@id)}">{
-              if (doc:title) then doc:title
-              else
-              if ($lang eq 'en') then 'General Information' else 'Allgemeines'
+      <ul>
+        <xsl:if test="doc:doc[@scope='global']">
+          <xsl:variable name="globalDocs" select="doc:doc[@scope='global']" />
+          <xsl:for-each
+            select="$globalDocs">
+            <li>
+              <a href="#{escape-html-uri(@id)}">{
+                if (doc:title) then doc:title
+                else
+                if ($lang eq 'en') then 'General Information' else 'Allgemeines'
               }</a>
-          </li>
-        </xsl:for-each>
-      </xsl:if>
-      <xsl:for-each-group select="doc:doc" group-by="doc:includedFrom/@href">
-        <xsl:variable name="stylesheetDoc" select="current-group()[@scope='stylesheet']" />
-        <xsl:variable name="elementDoc" select="current-group()[@scope='element' or not(@scope)]" />
-        <ul>
+            </li>
+          </xsl:for-each>
+        </xsl:if>
+        <xsl:for-each-group select="doc:doc" group-by="doc:includedFrom/@href">
+          <xsl:variable name="stylesheetDoc" select="current-group()[@scope='stylesheet']" />
+        <xsl:variable name="elementDoc"
+                      select="current-group()[@scope='element' or not(@scope)]" />
           <li>
-            <a href="#{escape-html-uri($stylesheetDoc/@id)}">{if
-        ($stylesheetDoc/doc:title)
-              then $stylesheetDoc/doc:title else
-        $stylesheetDoc/doc:includedFrom/@href
-              }</a>
+            <a href="#{escape-html-uri($stylesheetDoc/@id)}">{
+            if ($stylesheetDoc/doc:title)
+            then $stylesheetDoc/doc:title
+            else $stylesheetDoc/doc:includedFrom/@href
+            }</a>
           </li>
           <ul>
             <xsl:for-each select="$elementDoc">
@@ -393,16 +417,16 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
               </li>
             </xsl:for-each>
           </ul>
-        </ul>
-      </xsl:for-each-group>
+        </xsl:for-each-group>
+      </ul>
     </div>
   </xsl:template>
 
   <!--
       Render source code.
 
-      Source code is rendered into an accordion, collapsed by default. Syntax highlighting is done by `higlight.js`. See [the `head` of the HTML](#temp;createHtmlHead)
-      for inclusion of `highlight.js`.
+      Source code is rendered into an accordion, collapsed by default. Syntax highlighting is done by `Prism`. See [the `head` of the HTML](#temp;createHtmlHead)
+      for inclusion of `Prism`.
   -->
   <xsl:template name="renderSource">
     <details>
@@ -473,55 +497,64 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
     <xsl:param name="config" required="yes" />
     <xsl:param name="docDir" required="yes" />
     <xsl:param name="readme" />
-        <html lang="{if ($lang) then $lang else 'de'}">
-          <head>
-            <xsl:sequence select="$htmlHeadCommon" />
-          </head>
-          <body>
-            <nav>
-              <ul>
-                <li>
-                  <strong>{$title}</strong>
-                </li>
-              </ul>
-              <ul>
-                <li>
-                  <a href="#toc">{if ($lang eq 'en') then 'Table of Contents' else
-                  'Inhaltsverzeichnis'}</a>
-                </li>
-              </ul>
-            </nav>
+    <html lang="{if ($lang) then $lang else 'de'}">
+      <head>
+        <xsl:sequence select="$htmlHeadCommon" />
+      </head>
+      <body>
+        <nav>
+          <ul>
+            <li>
+              <strong>{$title}</strong>
+            </li>
+          </ul>
+          <ul>
+            <li>
+              <a href="#toc">{if ($lang eq 'en') then 'Table of Contents' else
+              'Inhaltsverzeichnis'}</a>
+            </li>
+            <li>
+              <label for="theme-switch">
+                <input type="checkbox"
+                       onclick="document.documentElement.setAttribute('data-theme', document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light')"
+                       id="theme-switch"
+                       name="dm-switch"
+                       role="switch" />
+              </label>
+            </li>
+          </ul>
+        </nav>
 
-            <h1 id="toc">Inhaltsverzeichnis</h1>
-            <ul>
-              <xsl:if test="$readme">
-                <li><a href="#readme">Readme</a></li>
-              </xsl:if>
-              <li>{if ($lang eq 'en') then 'Documented Transformations' else 'Dokumentierte Transformationen'}</li>
-              <ul>
-                <xsl:for-each select="$config/config:normalization">
-                  <li>
-                    <a href="{@distName}/index.html">{@name}</a>
-                  </li>
-                </xsl:for-each>
-              </ul>
-            </ul>
-            <xsl:if test="$readme">
-              <div id="readme">
-                <md-block>
-                  <xsl:choose>
-                    <xsl:when test="unparsed-text-available($readme)">
-                      <xsl:sequence select="unparsed-text($readme)" />
-                    </xsl:when>
-                    <xsl:otherwise>**FILE NOT FOUND: {$readme}**</xsl:otherwise>
-                  </xsl:choose>
-                </md-block>
-              </div>
-            </xsl:if>
-            <xsl:sequence select="$htmlFooter" />
-            <xsl:sequence select="$htmlBodyScripts" />
-          </body>
-        </html>
+        <h1 id="toc">Inhaltsverzeichnis</h1>
+        <ul>
+          <xsl:if test="$readme">
+            <li><a href="#readme">Readme</a></li>
+          </xsl:if>
+          <li>{if ($lang eq 'en') then 'Documented Transformations' else 'Dokumentierte Transformationen'}</li>
+          <ul>
+            <xsl:for-each select="$config/config:transformation">
+              <li>
+                <a href="{@distName}/index.html">{@name}</a>
+              </li>
+            </xsl:for-each>
+          </ul>
+        </ul>
+        <xsl:if test="$readme">
+          <div id="readme">
+            <md-block>
+              <xsl:choose>
+                <xsl:when test="unparsed-text-available($readme)">
+                  <xsl:sequence select="unparsed-text($readme)" />
+                </xsl:when>
+                <xsl:otherwise>**FILE NOT FOUND: {$readme}**</xsl:otherwise>
+              </xsl:choose>
+            </md-block>
+          </div>
+        </xsl:if>
+        <xsl:sequence select="$htmlFooter" />
+        <xsl:sequence select="$htmlBodyScripts" />
+      </body>
+    </html>
   </xsl:template>
 
 </xsl:stylesheet>

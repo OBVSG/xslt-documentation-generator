@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:doc="https://share.obvsg.at/xml/xsl/doc" xmlns:utils="https://share.obvsg.at/xml/xsl/utils" xmlns:config="https://share.obvsg.at/xml/misc/config" exclude-result-prefixes="xsl" expand-text="yes" version="3.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:fn="http://www.w3.org/2005/xpath-functions" xmlns:doc="https://share.obvsg.at/xml/xsl/doc" xmlns:utils="https://share.obvsg.at/xml/xsl/utils" xmlns:config="https://share.obvsg.at/xml/misc/config" exclude-result-prefixes="xsl" expand-text="yes" version="3.0">
 
   <doc:doc scope="global">
     <doc:title>XSLT Documentation Generator</doc:title>
@@ -42,6 +42,8 @@ saxon-xslt -xsl:xslt-documentation-generator/xslt/documentation-generator.xsl -i
 
   <xsl:param name="lang" select="'ger'" as="xs:string" />
   <xsl:param name="configFile" as="xs:string" />
+  <xsl:variable name="globalConfig"
+                select="if (doc-available($configFile)) then doc($configFile) else ()" />
 
   <xsl:preserve-space elements="doc:desc" />
 
@@ -62,17 +64,17 @@ saxon-xslt -xsl:xslt-documentation-generator/xslt/documentation-generator.xsl -i
 
     <xsl:variable name="config"
                   select="doc($configFile)/config:config" />
-    <xsl:variable name="normalizationConfig"
-                  select="$config/config:normalizations" />
-    <xsl:variable name="docConfig"
-                  select="$config/config:documentation" />
+    <xsl:variable name="transformationConfig"
+                  select="$config/config:transformations" />
+    <xsl:variable name="projConfig"
+                  select="$config/config:projectInfo" />
     <xsl:variable name="projectRoot">{
       base-uri($config)
       => replace("^file:", "")
       => replace("[^/]+$", "")
     }</xsl:variable>
     <xsl:variable name="docDir"
-                  select="if ($docConfig/docDir) then $projectRoot || $docConfig/docDir else $projectRoot || 'docs/'" />
+                  select="if ($projConfig/config:docDir) then $projectRoot || $projConfig/config:docDir || '/' else $projectRoot || 'docs/'" />
     <!-- Make index file -->
     <xsl:result-document href="{$docDir}/index.html"
                          method="html"
@@ -81,15 +83,15 @@ saxon-xslt -xsl:xslt-documentation-generator/xslt/documentation-generator.xsl -i
                          indent="no">
 
       <xsl:call-template name="createDocIndex">
-        <xsl:with-param name="title" select="$config/config:projectInfo/config:name" />
-        <xsl:with-param name="config" select="$normalizationConfig" />
+        <xsl:with-param name="title" select="$projConfig/config:name" />
+        <xsl:with-param name="config" select="$transformationConfig" />
         <xsl:with-param name="docDir" select="$docDir" />
-        <xsl:with-param name="readme" select="$projectRoot || $docConfig/config:readme/@href" />
+        <xsl:with-param name="readme" select="$projectRoot || $projConfig/config:readme/@href" />
       </xsl:call-template>
     </xsl:result-document>
 
     <!-- Create document for the stylesheets -->
-    <xsl:for-each select="$normalizationConfig/config:normalization">
+    <xsl:for-each select="$transformationConfig/config:transformation">
       <xsl:result-document href="{$docDir || @distName || '/index.html'}">
         <xsl:apply-templates select="doc($projectRoot || @main)" />
       </xsl:result-document>
@@ -106,7 +108,7 @@ saxon-xslt -xsl:xslt-documentation-generator/xslt/documentation-generator.xsl -i
           <xsl:with-param name="includedFrom" select="$includedFrom" />
         </xsl:apply-templates>
         <xsl:for-each select="$modulePaths">
-          <xsl:apply-templates select="doc(.('absPath'))/xsl:stylesheet/child::*" mode="collect">
+          <xsl:apply-templates select="doc(.('absPath'))/xsl:stylesheet" mode="collect">
             <xsl:with-param name="includedFrom" select=".('relPath')" />
           </xsl:apply-templates>
         </xsl:for-each>
