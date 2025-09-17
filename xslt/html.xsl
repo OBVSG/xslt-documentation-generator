@@ -189,7 +189,7 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
       </xsl:if>
       <xsl:call-template name="renderBackrefs" />
     </xsl:variable>
-    <xsl:if test="$refs">
+    <xsl:if test="$refs/table">
       <xsl:choose>
         <xsl:when test="$lang eq 'en'">
           <h4>References</h4>
