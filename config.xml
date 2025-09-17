@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config xmlns="https://share.obvsg.at/xml/misc/config">
+  <projectInfo>
+    <name>xslt-documentation-generator</name>
+    <readme href="README.md" />
+    <distDir href="dist" />
+    <docDir href="doc" />
+    <docWebsite href="https://share.obvsg.at/xsldocs/xslt-documentation-generator" />
+    <contributors>
+      <contributor profile="https://github.com/schuach" email="stefan.schuh@obvsg.at">Stefan Schuh</contributor>
+    </contributors>
+  </projectInfo>
+</config>
