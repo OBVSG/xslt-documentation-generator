@@ -119,6 +119,7 @@
           </doc:attribute>
         </xsl:for-each>
       </xsl:if>
+      <xsl:sequence select="$docForElement/doc:doc/doc:*[starts-with(local-name(), '_')]" />
       <doc:src>
         <xsl:sequence select="." />
       </doc:src>

@@ -83,6 +83,9 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
         <xsl:call-template name="navbar" />
         <xsl:call-template name="createToc" />
         <xsl:apply-templates mode="html" />
+        <xsl:if test="//doc:_marcFields">
+          <xsl:call-template name="fieldIndex" />
+        </xsl:if>
         <xsl:sequence select="$htmlFooter" />
         <xsl:sequence select="$htmlBodyScripts" />
       </body>
@@ -151,7 +154,7 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
       @references temp;renderMode Render information specific to `xsl:mode` declarations.
   -->
   <xsl:template match="doc:doc" mode="html">
-    <div class="docBlock elementLevel" id="{escape-html-uri(@id)}">
+    <div class="docBlock elementLevel" id="{escape-html-uri(@id)}" data-marc-fields="{doc:_marcFields}">
       <div class="heading-container">
         <h3>{doc:dispLabel}</h3>
         <xsl:if test="doc:includedFrom/@href ne ''">
@@ -418,6 +421,29 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
             </xsl:for-each>
           </ul>
         </xsl:for-each-group>
+        <xsl:if test="//doc:_marcFields">
+          <li><a href="#fieldIndex">{if ($lang eq 'en') then 'Field Index' else 'Feld-Index'}</a></li>
+        </xsl:if>
+      </ul>
+    </div>
+  </xsl:template>
+
+  <xsl:template name="fieldIndex">
+    <div id="fieldIndex">
+      <h1>Feld-Index</h1>
+      <ul>
+        <xsl:for-each-group select="doc:doc"
+          group-by="doc:_marcFields => tokenize()">
+          <xsl:sort select="current-grouping-key()" />
+          <li>
+            <xsl:sequence select="current-grouping-key()" />
+            <ul>
+              <xsl:for-each select="current-group()">
+                <li><a href="#{escape-html-uri(@id)}">{doc:dispLabel}</a></li>
+              </xsl:for-each>
+            </ul>
+          </li>
+        </xsl:for-each-group>
       </ul>
     </div>
   </xsl:template>
@@ -472,6 +498,9 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
         <li><strong>{$title}</strong></li>
       </ul>
       <ul>
+        <xsl:if test="//doc:_marcFields">
+          <li><a href="#fieldIndex">{if ($lang eq 'en') then 'Field Index' else 'Feld-Index'}</a></li>
+        </xsl:if>
         <li><a href="#toc">{if ($lang eq 'en') then 'Table of Contents' else 'Inhaltsverzeichnis'}</a></li>
         <li>
           <label for="theme-switch">
