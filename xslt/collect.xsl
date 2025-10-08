@@ -119,6 +119,7 @@
           </doc:attribute>
         </xsl:for-each>
       </xsl:if>
+      <xsl:sequence select="$docForElement/doc:doc/doc:*[starts-with(local-name(), '_')]" />
       <doc:src>
         <xsl:sequence select="." />
       </doc:src>
@@ -309,6 +310,13 @@
           </xsl:when>
           <xsl:when test="starts-with(., 'title')">
             <doc:title>{replace(., '^title\s+', '') => normalize-space()}</doc:title>
+          </xsl:when>
+          <!-- Allow application specific extensions starting with "_" -->
+          <xsl:when test="starts-with(., '_')">
+            <xsl:variable name="name" select="head(tokenize(.))" />
+            <xsl:element name="{'doc:' || $name}">
+              <xsl:text>{replace(., '^' || $name, '') => normalize-space()}</xsl:text>
+            </xsl:element>
           </xsl:when>
           <xsl:otherwise>
             <xsl:message>When parsing doc-comment: Encountered unknown property "@{.}". Ignoring.</xsl:message>
