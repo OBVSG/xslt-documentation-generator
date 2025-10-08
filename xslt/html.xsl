@@ -40,6 +40,32 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
   <xsl:variable name="htmlBodyScripts">
     <script type="module" src="https://md-block.verou.me/md-block.js"></script>
     <script src=" https://cdn.jsdelivr.net/npm/prismjs@1.30.0/prism.min.js "></script>
+    <script type="text/javascript" xsl:expand-text="no">
+      function toggleTheme() {
+          document.documentElement.setAttribute('data-theme', document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light')
+      }
+
+      function filterDivsByMarcField(token) {
+        const divs = document.querySelectorAll('div.docBlock, #toc, #fieldIndex');
+
+        divs.forEach(div => {
+          const fieldValue = div.getAttribute('data-marc-fields');
+          const tokens = fieldValue ? fieldValue.split(/\s+/) : [];
+
+          if (token === '' || tokens.map(val => val.startsWith(token)).includes(true)) {
+            div.style.display = '';
+          } else {
+            div.style.display = 'none';
+          }
+        });
+      }
+
+      // Add event listener to input field
+      document.getElementById('tagFilter').addEventListener('input', function() {
+            const token = this.value.trim();
+            filterDivsByMarcField(token);
+          });
+    </script>
   </xsl:variable>
 
   <xsl:variable name="htmlFooter">
@@ -502,10 +528,13 @@ Backreferences are also handled here, because at this stage, all `doc:doc`-eleme
           <li><a href="#fieldIndex">{if ($lang eq 'en') then 'Field Index' else 'Feld-Index'}</a></li>
         </xsl:if>
         <li><a href="#toc">{if ($lang eq 'en') then 'Table of Contents' else 'Inhaltsverzeichnis'}</a></li>
+        <xsl:if test="//doc:_marcFields">
+          <li><input type="text" id="tagFilter" placeholder="Filter by tag ..." /></li>
+        </xsl:if>
         <li>
           <label for="theme-switch">
             <input type="checkbox"
-                   onclick="document.documentElement.setAttribute('data-theme', document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light')"
+                   onclick="toggleTheme()"
                    id="theme-switch"
                    name="dm-switch"
                    role="switch" />
