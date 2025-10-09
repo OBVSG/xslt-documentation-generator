@@ -53,7 +53,7 @@ This stylesheet is intended to be used with Saxon from the command line. There a
 There are two parameters that can (or must) be passed to the transformation:
 
 - `configFile`: A configuration file, specifying input and output
-- `lang`: The language used for fixed texts in HTML output. This parameter is mandatory if the transformation is invoked with a configuration file. Possible values are `ger` and `eng` for German and English, defaulting to `ger`.
+- `lang`: The language used for fixed texts in HTML output. This parameter is mandatory if the transformation is invoked with a configuration file. Possible values are `de` and `en` for German and English, defaulting to `de`.
 
 ## Supplying a stylesheet to document
 When supplying a stylesheet, documentation gets extracted from that stylesheet and all stylesheets included with an `xsl:include` instruction. The result of the transformation is written to `stdout`.

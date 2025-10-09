@@ -37,11 +37,10 @@ saxon-xslt -xsl:xslt-documentation-generator/xslt/documentation-generator.xsl -i
   </doc:doc>
 
   <xsl:output method="html" version="5.0" encoding="UTF-8" indent="no" />
-  <!-- <xsl:output indent="yes" /> -->
   <xsl:mode on-no-match="shallow-skip" />
 
-  <xsl:param name="lang" select="'ger'" as="xs:string" />
-  <xsl:param name="configFile" as="xs:string" />
+  <xsl:param name="lang" select="'de'" as="xs:string" />
+  <xsl:param name="configFile" as="xs:string" select="''" />
   <xsl:variable name="globalConfig"
                 select="if (doc-available($configFile)) then doc($configFile) else ()" />
 
@@ -58,12 +57,12 @@ saxon-xslt -xsl:xslt-documentation-generator/xslt/documentation-generator.xsl -i
   -->
   <xsl:template name="main">
     <!-- Error out when there's no config file. -->
-    <xsl:if test="not($configFile)">
+    <xsl:if test="$configFile eq ''">
       <xsl:message terminate="yes">No configuration file given!</xsl:message>
     </xsl:if>
 
     <xsl:variable name="config"
-                  select="doc($configFile)/config:config" />
+                  select="$globalConfig/config:config" />
     <xsl:variable name="transformationConfig"
                   select="$config/config:transformations" />
     <xsl:variable name="projConfig"
