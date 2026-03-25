@@ -18,7 +18,7 @@ function saxon-xslt()
 function print_usage () {
     cat <<EOF
 USAGE
-    ${BASH_SOURCE[0]} [[-c CONFIG_FILE] [-l LANGUAGE]] | <xslt-source.xsl>
+    ${BASH_SOURCE[0]} [[-c CONFIG_FILE] | [-x XSLT_SOURCE]] [-l LANGUAGE] <xslt-source.xsl>
 EOF
 }
 
@@ -49,12 +49,18 @@ while [ "$1" != "" ]; do
         -h | --help )           print_usage
                                 exit
                                 ;;
+        -s | --xslt-src )       shift
+                                xslt_source=$1
+                                ;;
         * )                     xslt_source=$1
     esac
     shift
 done
 
-if [ -n "$config_file" ]; then
+if [ -n "$config_file" ] && [ -n "$xslt_source" ]; then
+    errcho params --config-file and --xslt-src are mutually exclusive!
+    exit 1
+elif [ -n "$config_file" ]; then
     saxon-xslt -xsl:xslt-documentation-generator/xslt/documentation-generator.xsl -it:main lang="$lang" configFile=$(realpath "$config_file")
 elif [ -n "$xslt_source" ]; then
     saxon-xslt -xsl:xslt-documentation-generator/xslt/documentation-generator.xsl lang="$lang" $(realpath $xslt_source)
