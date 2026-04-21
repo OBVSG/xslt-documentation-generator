@@ -1,0 +1,70 @@
+#!/bin/bash
+
+### Saxon-Setup
+
+if [ -z "$SAXON_HOME" ]; then
+    errcho Environment variable SAXON_HOME is not set!
+    exit 1
+fi
+
+function saxon-xslt()
+{
+    CLASSPATH=$(ls -1 $(realpath "$SAXON_HOME") | xargs -n1 printf "$SAXON_HOME/%s:" | head -c -1)
+    exec java $JAVA_OPTS -classpath "$CLASSPATH" net.sf.saxon.Transform "$@"
+}
+
+### Printing usage and errors
+
+function print_usage () {
+    cat <<EOF
+USAGE
+    ${BASH_SOURCE[0]} [[-c CONFIG_FILE] | [-x XSLT_SOURCE]] [-l LANGUAGE] <xslt-source.xsl>
+EOF
+}
+
+function errcho () {
+    echo "$@" 1>&2
+}
+
+function err () {
+    errcho "$@"
+    print_usage 1>&2
+    exit 1;
+}
+
+### Main
+config_file=
+lang=en
+xslt_source=
+DOCGEN_STYLESHEET=$(dirname $(dirname "$(readlink -e "${BASH_SOURCE[0]}")"))/xslt/documentation-generator.xsl
+#
+while [ "$1" != "" ]; do
+    case $1 in
+        -c | --config-file )    shift
+                                config_file=$1
+                                ;;
+        -l | --language )       shift
+                                lang=$1
+                                ;;
+        -h | --help )           print_usage
+                                exit
+                                ;;
+        -s | --xslt-src )       shift
+                                xslt_source=$1
+                                ;;
+        * )                     xslt_source=$1
+    esac
+    shift
+done
+
+if [ -n "$config_file" ] && [ -n "$xslt_source" ]; then
+    errcho params --config-file and --xslt-src are mutually exclusive!
+    exit 1
+elif [ -n "$config_file" ]; then
+    saxon-xslt -xsl:"$DOCGEN_STYLESHEET" -it:main lang="$lang" configFile=$(realpath "$config_file")
+elif [ -n "$xslt_source" ]; then
+    saxon-xslt -xsl:"$DOCGEN_STYLESHEET" lang="$lang" $(realpath $xslt_source)
+else
+    print_usage
+    exit 1
+fi

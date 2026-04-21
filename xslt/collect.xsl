@@ -47,6 +47,11 @@
     </xsl:variable>
     <doc:doc scope="{$docFromComment/doc:doc/@scope}"
              id="{$docFromComment/doc:doc/@scope};{$includedFrom}">
+      <xsl:if test="$docFromComment/doc:doc/doc:includeMd">
+        <xsl:variable name="cwd" select="replace(base-uri(), '[^/]+$', '')" />
+        <xsl:variable name="mdHref" select="$docFromComment/doc:doc/doc:includeMd/@href" />
+        <doc:desc>{utils:fetchTextFromFile($cwd, $mdHref)}</doc:desc>
+      </xsl:if>
       <xsl:sequence select="$docFromComment/doc:doc/*" />
       <doc:includedFrom href="{$includedFrom}" />
     </doc:doc>
@@ -90,9 +95,9 @@
         }</doc:desc>
       </xsl:if>
       <xsl:if test="$docForElement/doc:doc/doc:includeMd">
-        <doc:desc>
-          <xsl:apply-templates select="doc:includeMd" mode="collect" />
-        </doc:desc>
+        <xsl:variable name="cwd" select="replace(base-uri(), '[^/]+$', '')" />
+        <xsl:variable name="mdHref" select="$docForElement/doc:doc/doc:includeMd/@href" />
+        <doc:desc>{utils:fetchTextFromFile($cwd, $mdHref)}</doc:desc>
       </xsl:if>
       <xsl:sequence select="$docForElement/doc:doc/doc:desc" />
       <xsl:sequence select="$docForElement/doc:doc/doc:context" />
@@ -140,7 +145,9 @@
         <xsl:when test="(preceding-sibling::element() | preceding-sibling::comment())[last()][self::comment()]">
           <xsl:sequence select="utils:docFromString(preceding-sibling::comment()[1]/string())" />
         </xsl:when>
-        <xsl:otherwise><doc:doc /></xsl:otherwise>
+        <xsl:otherwise>
+          <doc:doc />
+        </xsl:otherwise>
       </xsl:choose>
   </xsl:template>
 
@@ -327,18 +334,34 @@
   </xsl:function>
 
   <!--
-      Include Markdown from file.
+      If there's an explicit `doc:includeMd` element, create a `doc:desc` element with the text from the file as content.
   -->
   <xsl:template match="doc:includeMd" mode="collect">
-    <xsl:variable name="pwd" select="base-uri() =&gt; replace('[^/]+$', '')" />
-    <xsl:variable name="inclAbsPath" select="if (starts-with(@href, 'http:')) then @href else $pwd || @href" />
+    <xsl:variable name="cwd" select="base-uri() =&gt; replace('[^/]+$', '')" />
+    <doc:desc>Hallo!
+    {
+      utils:fetchTextFromFile($cwd, @href)
+    }</doc:desc>
+  </xsl:template>
+
+  <!--
+      Fetche text from a file.
+
+      The current working directory has to be given explicitly as it cannot always be inferenced from context.
+
+      @param cwd The current working directory. If `$href` is a relative URI, its relative to `$cwd`.
+  -->
+  <xsl:function name="utils:fetchTextFromFile">
+    <xsl:param name="cwd" as="xs:string" required="yes" />
+    <xsl:param name="href" as="xs:string" required="yes" />
+    <xsl:variable name="inclAbsPath" select="if (starts-with($href, 'http') or starts-with($href, '/')) then $href else $cwd || $href" />
     <xsl:choose>
       <xsl:when test="unparsed-text-available($inclAbsPath)">
         <xsl:sequence select="unparsed-text($inclAbsPath)" />
       </xsl:when>
       <xsl:otherwise>**FILE NOT FOUND: {$inclAbsPath}**</xsl:otherwise>
     </xsl:choose>
-  </xsl:template>
+  </xsl:function>
 
   <!--
       Dedent a multiline string by the indentation amount of the first line.

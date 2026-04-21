@@ -53,7 +53,7 @@ This stylesheet is intended to be used with Saxon from the command line. There a
 There are two parameters that can (or must) be passed to the transformation:
 
 - `configFile`: A configuration file, specifying input and output
-- `lang`: The language used for fixed texts in HTML output. This parameter is mandatory if the transformation is invoked with a configuration file. Possible values are `ger` and `eng` for German and English, defaulting to `ger`.
+- `lang`: The language used for fixed texts in HTML output. This parameter is mandatory if the transformation is invoked with a configuration file. Possible values are `de` and `en` for German and English, defaulting to `de`.
 
 ## Supplying a stylesheet to document
 When supplying a stylesheet, documentation gets extracted from that stylesheet and all stylesheets included with an `xsl:include` instruction. The result of the transformation is written to `stdout`.
@@ -75,3 +75,13 @@ The path to the config file has to be absolute or relative to `documentation-gen
 ```bash
 java -classpath "/path/to/saxon.jar" net.sf.saxon.Transform -xsl:xslt-documentation-generator/xslt/documentation-generator.xsl -it:main lang=ger configFile=../../config.xml
 ```
+
+## Using the driver script
+For convenience there's a bash script, `bin/xdocgen`. It too takes three parameters, `-l | --language`, `-x | --xslt-src` and `-c | --config-file`. `--language` defaults to `en`. `--config-file` and `--xslt-src` (as well as providing the stylesheet at the end without flag) are mutually exclusive. 
+
+``` bash
+USAGE
+    ${BASH_SOURCE[0]} [[-c CONFIG_FILE] | [-x XSLT_SOURCE]] [-l LANGUAGE] <xslt-source.xsl>
+```
+
+Add it to `PATH` to use it from anywhere.
