@@ -36,7 +36,7 @@
     <xsl:param name="stylesheetRoot" />
     <xsl:variable name="uriBase">{base-uri($stylesheetRoot) => replace("^file:", "") => replace("[^/]+$", "")}</xsl:variable>
     <xsl:variable name="modulePaths" as="map(*)*">
-      <xsl:for-each select="$stylesheetRoot/xsl:include/@href">
+      <xsl:for-each select="$stylesheetRoot/(xsl:include|xsl:import)/@href">
         <xsl:variable name="absPath"
                       select="if (starts-with(., '/') or starts-with(., 'http')) then . else $uriBase || ." />
         <xsl:sequence select="(map{'absPath': $absPath, 'relPath': string(.)}, utils:getModules(doc($absPath)/xsl:stylesheet))" />
